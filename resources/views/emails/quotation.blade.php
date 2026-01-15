@@ -188,6 +188,9 @@
                     @if($item->has_fix_glass)
                     <div class="item-detail">✓ With Fix Glass</div>
                     @endif
+                    @if($item->has_key_lock)
+                    <div class="item-detail">✓ With Key Lock</div>
+                    @endif
                     <div class="item-detail">Quantity: {{ $item->quantity }} × Rs. {{ number_format($item->unit_price, 2) }}</div>
                     <div class="item-detail"><strong>Total: Rs. {{ number_format($item->total, 2) }}</strong></div>
                 </div>

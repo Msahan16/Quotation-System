@@ -53,6 +53,9 @@ class QuotationList extends Component
             if ($item->has_fix_glass) {
                 $message .= "   • With Fix Glass\n";
             }
+            if ($item->has_key_lock) {
+                $message .= "   • With Key Lock\n";
+            }
             $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
         }

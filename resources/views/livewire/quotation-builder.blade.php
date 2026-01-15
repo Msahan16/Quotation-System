@@ -82,6 +82,17 @@
                         <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_fix_glass'] ? 'With Fix Glass' : 'Standard' }}</span>
                     </div>
 
+                    @if($selectedCategory['has_key_lock'])
+                    <div class="form-group">
+                        <label class="form-label">Key Lock Option</label>
+                        <label class="switch">
+                            <input type="checkbox" wire:model.live="tempItem.has_key_lock">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_key_lock'] ? 'With Key Lock' : 'Standard' }}</span>
+                    </div>
+                    @endif
+
                     <div class="form-group">
                         <label class="form-label">Size / Dimensions</label>
                         <input type="text" class="form-control" wire:model="tempItem.size" placeholder="e.g. 10x12 or Standard">
@@ -142,6 +153,7 @@
                                                 {{ $item['size'] }} | {{ $item['color'] }} 
                                                 @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
                                                 @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
+                                                @if($item['has_key_lock'] ?? false) <span class="key-lock-badge">+ Key Lock</span> @endif
                                             </div>
                                         </div>
                                         <button wire:click="removeItem({{ $index }})" class="remove-btn" title="Remove">
@@ -391,6 +403,15 @@
         .fix-glass-badge {
             background: #d1fae5;
             color: #065f46;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .key-lock-badge {
+            background: #fed7aa;
+            color: #92400e;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.75rem;
