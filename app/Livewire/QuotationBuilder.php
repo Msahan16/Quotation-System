@@ -62,6 +62,7 @@ class QuotationBuilder extends Component
     public $tempItem = [
         'color' => '',
         'has_louver' => false,
+        'has_fix_glass' => false,
         'size' => '',
         'unit_price' => 0,
         'quantity' => 1,
@@ -99,6 +100,7 @@ class QuotationBuilder extends Component
                         'product_name' => $item->product_name,
                         'color' => $item->variant,
                         'has_louver' => $item->has_louver,
+                        'has_fix_glass' => $item->has_fix_glass ?? false,
                         'size' => $item->size,
                         'unit_price' => $item->unit_price,
                         'quantity' => $item->quantity,
@@ -136,6 +138,7 @@ class QuotationBuilder extends Component
         $this->tempItem = [
             'color' => $this->selectedCategory['colors'][0] ?? '',
             'has_louver' => false,
+            'has_fix_glass' => false,
             'size' => '',
             'unit_price' => 0,
             'quantity' => 1,
@@ -154,6 +157,7 @@ class QuotationBuilder extends Component
             'product_name' => $this->selectedCategory['name'],
             'color' => $this->tempItem['color'],
             'has_louver' => $this->tempItem['has_louver'],
+            'has_fix_glass' => $this->tempItem['has_fix_glass'],
             'size' => $this->tempItem['size'],
             'unit_price' => $this->tempItem['unit_price'],
             'quantity' => $this->tempItem['quantity'],
@@ -250,6 +254,9 @@ class QuotationBuilder extends Component
             $message .= "   • Color: {$item->variant}\n";
             if ($item->has_louver) {
                 $message .= "   • With Louver\n";
+            }
+            if ($item->has_fix_glass) {
+                $message .= "   • With Fix Glass\n";
             }
             $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
@@ -358,6 +365,7 @@ class QuotationBuilder extends Component
                 'product_name' => $item['product_name'],
                 'variant' => $item['color'],
                 'has_louver' => $item['has_louver'],
+                'has_fix_glass' => $item['has_fix_glass'] ?? false,
                 'size' => $item['size'],
                 'unit_price' => $item['unit_price'],
                 'quantity' => $item['quantity'],

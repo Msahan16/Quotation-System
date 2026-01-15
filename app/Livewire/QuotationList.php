@@ -50,6 +50,9 @@ class QuotationList extends Component
             if ($item->has_louver) {
                 $message .= "   • With Louver\n";
             }
+            if ($item->has_fix_glass) {
+                $message .= "   • With Fix Glass\n";
+            }
             $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
         }

@@ -83,7 +83,11 @@
             <tr>
                 <td>
                     <div style="font-weight: bold;">{{ $item->product_name }}</div>
-                    <div style="font-size: 9px; color: #666;">{{ $item->variant }} @if($item->has_louver) (With Louver) @endif</div>
+                    <div style="font-size: 9px; color: #666;">
+                        {{ $item->variant }}
+                        @if($item->has_louver) (With Louver) @endif
+                        @if($item->has_fix_glass) (With Fix Glass) @endif
+                    </div>
                 </td>
                 <td class="center">{{ $item->size }}</td>
                 <td class="center">{{ $item->quantity }}</td>

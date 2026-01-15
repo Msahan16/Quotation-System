@@ -74,6 +74,15 @@
                     @endif
 
                     <div class="form-group">
+                        <label class="form-label">Fix Glass Option</label>
+                        <label class="switch">
+                            <input type="checkbox" wire:model.live="tempItem.has_fix_glass">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_fix_glass'] ? 'With Fix Glass' : 'Standard' }}</span>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Size / Dimensions</label>
                         <input type="text" class="form-control" wire:model="tempItem.size" placeholder="e.g. 10x12 or Standard">
                         @error('tempItem.size') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
@@ -132,6 +141,7 @@
                                             <div class="item-details">
                                                 {{ $item['size'] }} | {{ $item['color'] }} 
                                                 @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
+                                                @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
                                             </div>
                                         </div>
                                         <button wire:click="removeItem({{ $index }})" class="remove-btn" title="Remove">
@@ -239,6 +249,11 @@
                         window.open(data.whatsappUrl, '_blank');
                     }, 800);
                 }
+
+                // 3. Force component refresh to clear all fields
+                setTimeout(() => {
+                    @this.$refresh();
+                }, 1000);
             });
 
             @this.on('show-error', (event) => {
@@ -372,6 +387,15 @@
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
+        }
+        .fix-glass-badge {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
         }
         .remove-btn {
             background: #fee2e2;
