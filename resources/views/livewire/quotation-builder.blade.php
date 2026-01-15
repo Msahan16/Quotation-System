@@ -1,12 +1,20 @@
 <div>
-    <header>
-        <div>
-            <h1>Professional Quotation</h1>
-            <div style="font-size: 0.9rem; margin-top: 5px;">A.K.M. Aluminium Fabrication</div>
+    <header class="builder-header">
+        <div class="header-left">
+            <h1>{{ $editingQuotationId ? 'Edit Quotation' : 'Professional Quotation' }}</h1>
+            <div class="subtitle">A.K.M. Aluminium Fabrication</div>
         </div>
-        <div class="company-details">
-            <div>No.551/6 Kandy road, Malwatta Nittambuwa</div>
-            <div>0750944571 / 0702098959</div>
+        <div class="header-right">
+            <div class="company-details">
+                <div>No.551/6 Kandy road, Malwatta Nittambuwa</div>
+                <div>0750944571 / 0702098959</div>
+            </div>
+            <a href="{{ route('quotation.list') }}" wire:navigate class="btn view-history-btn">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>View History</span>
+            </a>
         </div>
     </header>
 
@@ -113,38 +121,40 @@
 
                 <div style="border-top: 1px solid var(--border); margin: 20px 0;"></div>
 
-                <div style="max-height: 400px; overflow-y: auto;">
+                <div class="items-container">
                     @if(count($items) > 0)
-                        <table class="quote-table">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($items as $index => $item)
-                                    <tr>
-                                        <td>
-                                            <div style="font-weight:600;">{{ $item['product_name'] }}</div>
-                                            <div style="font-size:0.8rem;color:var(--text-secondary);">
+                        <div class="items-list">
+                            @foreach($items as $index => $item)
+                                <div class="item-card">
+                                    <div class="item-header">
+                                        <div class="item-info">
+                                            <div class="item-name">{{ $item['product_name'] }}</div>
+                                            <div class="item-details">
                                                 {{ $item['size'] }} | {{ $item['color'] }} 
-                                                @if($item['has_louver']) | Louver @endif
-                                                <br>
-                                                {{ $item['quantity'] }} x {{ $item['unit_price'] }}
+                                                @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
                                             </div>
-                                        </td>
-                                        <td style="vertical-align:top;font-weight:600;">
-                                            {{ number_format($item['total'], 2) }}
-                                        </td>
-                                        <td style="vertical-align:top;text-align:right;">
-                                            <button wire:click="removeItem({{ $index }})" style="border:none;background:none;color:var(--danger);cursor:pointer;">×</button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        </div>
+                                        <button wire:click="removeItem({{ $index }})" class="remove-btn" title="Remove">
+                                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+                                    <div class="item-inputs">
+                                        <div class="input-group">
+                                            <label>Qty</label>
+                                            <input type="number" wire:model.live="items.{{ $index }}.quantity" min="1" class="qty-input">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Unit Price</label>
+                                            <input type="number" wire:model.live="items.{{ $index }}.unit_price" min="0" step="0.01" class="price-input">
+                                        </div>
+                                        <div class="input-group total-display">
+                                            <label>Total</label>
+                                            <div class="total-value">Rs. {{ number_format($item['total'] ?? 0, 2) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     @else
                         <div style="text-align:center;padding:20px;color:var(--text-secondary);">
                             No items added. Select a product to begin.
@@ -246,4 +256,234 @@
             });
         });
     </script>
+    <style>
+        .builder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .builder-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .builder-header .subtitle {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        .header-right {
+            display: flex; 
+            align-items: center; 
+            gap: 20px;
+        }
+        .header-right .company-details {
+            text-align: right;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        .view-history-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 99px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 5px;
+        }
+        .view-history-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        .view-history-btn:active {
+            transform: translateY(0);
+        }
+        .view-history-btn svg {
+            transition: transform 0.3s;
+        }
+        .view-history-btn:hover svg {
+            transform: rotate(-15deg);
+        }
+
+        /* Items Container Styles */
+        .items-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .item-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.2s;
+        }
+        .item-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-color: #cbd5e1;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .item-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .louver-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .remove-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .remove-btn:hover {
+            background: #fecaca;
+            transform: scale(1.1);
+        }
+        .item-inputs {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 10px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .qty-input, .price-input {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .qty-input:focus, .price-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        .total-display {
+            justify-content: center;
+        }
+        .total-value {
+            background: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .builder-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 35px 20px;
+                border-radius: 0 0 35px 35px;
+            }
+            .header-left h1 {
+                font-size: 1.75rem !important;
+                letter-spacing: -0.5px;
+            }
+            .header-right {
+                flex-direction: column;
+                gap: 18px;
+                width: 100%;
+            }
+            .header-right .company-details {
+                text-align: center;
+                font-size: 0.85rem;
+                opacity: 0.8;
+                max-width: 250px;
+                margin: 0 auto;
+            }
+            .view-history-btn {
+                width: auto;
+                min-width: 200px;
+                padding: 14px 35px;
+                font-size: 0.95rem;
+            }
+            
+            /* Mobile item cards */
+            .item-inputs {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .input-group:last-child {
+                grid-column: 1 / -1;
+            }
+            .item-card {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .item-inputs {
+                grid-template-columns: 1fr;
+            }
+            .input-group:last-child {
+                grid-column: auto;
+            }
+        }
+    </style>
 </div>

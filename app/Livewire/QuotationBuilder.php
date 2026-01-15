@@ -7,6 +7,8 @@ use App\Models\Quotation;
 use App\Models\QuotationItem;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\QuotationMail;
 
 class QuotationBuilder extends Component
 {
@@ -75,11 +77,57 @@ class QuotationBuilder extends Component
 
     public $lastQuotationNumber = null;
     public $lastDownloadUrl = null;
+    public $editingQuotationId = null;
 
-    public function mount()
+    public function mount($edit = null)
     {
+        if ($edit) {
+            $quotation = Quotation::with('items')->find($edit);
+            if ($quotation) {
+                $this->editingQuotationId = $quotation->id;
+                $this->customer_name = $quotation->customer_name;
+                $this->customer_phone = $quotation->customer_phone;
+                $this->date = $quotation->date->format('Y-m-d');
+                $this->quotation_number = $quotation->quotation_number;
+                $this->fixed_charge = $quotation->fixed_charge;
+                $this->transport_charge = $quotation->transport_charge;
+                $this->additional_amount = $quotation->additional_amount;
+                $this->additional_notes = $quotation->additional_notes;
+
+                foreach ($quotation->items as $item) {
+                    $this->items[] = [
+                        'product_name' => $item->product_name,
+                        'color' => $item->variant,
+                        'has_louver' => $item->has_louver,
+                        'size' => $item->size,
+                        'unit_price' => $item->unit_price,
+                        'quantity' => $item->quantity,
+                        'total' => $item->total,
+                    ];
+                }
+                return;
+            }
+        }
         $this->date = date('Y-m-d');
-        $this->quotation_number = 'QT-' . strtoupper(Str::random(6));
+        $this->quotation_number = $this->generateNextNumber();
+    }
+
+    private function generateNextNumber()
+    {
+        $lastQuotation = Quotation::latest('id')->first();
+        if (!$lastQuotation) {
+            return '#QT-0001';
+        }
+
+        $lastNumber = $lastQuotation->quotation_number;
+        // Extract number from format #QT-0001
+        if (preg_match('/#QT-(\d+)/', $lastNumber, $matches)) {
+            $nextNumber = intval($matches[1]) + 1;
+            return '#QT-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        }
+
+        // Fallback or if format was different
+        return '#QT-0001';
     }
 
     public function selectCategory($index)
@@ -115,6 +163,19 @@ class QuotationBuilder extends Component
         $this->selectedCategory = null; // Close modal/panel
     }
 
+    public function updatedItems($value, $key)
+    {
+        // When items.0.quantity or items.0.unit_price changes, recalculate total
+        if (preg_match('/(\d+)\.(quantity|unit_price)/', $key, $matches)) {
+            $index = $matches[1];
+            if (isset($this->items[$index])) {
+                $qty = (float)($this->items[$index]['quantity'] ?? 1);
+                $price = (float)($this->items[$index]['unit_price'] ?? 0);
+                $this->items[$index]['total'] = $qty * $price;
+            }
+        }
+    }
+
     public function removeItem($index)
     {
         unset($this->items[$index]);
@@ -141,6 +202,14 @@ class QuotationBuilder extends Component
 
         $quotation = $this->createQuotation();
         $downloadUrl = route('quotation.download', $quotation);
+
+        // Send email notification
+        try {
+            Mail::to('mohammedshn2002@gmail.com')->send(new QuotationMail($quotation));
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            \Log::error('Failed to send quotation email: ' . $e->getMessage());
+        }
 
         $this->resetForm();
         $this->lastQuotationNumber = $quotation->quotation_number;
@@ -207,16 +276,24 @@ class QuotationBuilder extends Component
         }
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-        $message .= "✅ *Terms & Conditions:*\n";
+        $message .= "*Terms & Conditions:*\n";
         $message .= "• Valid for 1 week\n";
         $message .= "• 50% advance payment required\n";
         $message .= "• Transport calculated by location\n\n";
-        $message .= "📞 Contact: 0750944571 / 0702098959\n";
-        $message .= "📍 No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
+        $message .= "Contact: 0750944571 / 0702098959\n";
+        $message .= "No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
         $message .= "_A detailed PDF quotation has been prepared for your reference._";
 
         $phone = $this->customer_phone ? preg_replace('/[^0-9]/', '', '94' . ltrim($this->customer_phone, '0')) : '';
         $whatsappUrl = "https://wa.me/{$phone}?text=" . urlencode($message);
+
+        // Send email notification
+        try {
+            Mail::to('mohammedshn2002@gmail.com')->send(new QuotationMail($quotation));
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            \Log::error('Failed to send quotation email: ' . $e->getMessage());
+        }
 
         $this->resetForm();
         $this->lastQuotationNumber = $quotation->quotation_number;
@@ -241,24 +318,40 @@ class QuotationBuilder extends Component
         $this->selectedCategory = null;
         $this->lastQuotationNumber = null;
         $this->lastDownloadUrl = null;
-        $this->quotation_number = 'QT-' . strtoupper(Str::random(6));
+        $this->quotation_number = $this->generateNextNumber();
         $this->date = date('Y-m-d');
     }
 
     private function createQuotation()
     {
-        $quotation = Quotation::create([
-            'customer_name' => $this->customer_name,
-            'customer_phone' => $this->customer_phone,
-            'date' => $this->date,
-            'quotation_number' => $this->quotation_number,
-            'subtotal' => $this->subtotal,
-            'fixed_charge' => $this->fixed_charge,
-            'transport_charge' => $this->transport_charge,
-            'additional_amount' => $this->additional_amount,
-            'additional_notes' => $this->additional_notes,
-            'grand_total' => $this->total,
-        ]);
+        if ($this->editingQuotationId) {
+            $quotation = Quotation::find($this->editingQuotationId);
+            $quotation->update([
+                'customer_name' => $this->customer_name,
+                'customer_phone' => $this->customer_phone,
+                'date' => $this->date,
+                'subtotal' => $this->subtotal,
+                'fixed_charge' => $this->fixed_charge,
+                'transport_charge' => $this->transport_charge,
+                'additional_amount' => $this->additional_amount,
+                'additional_notes' => $this->additional_notes,
+                'grand_total' => $this->total,
+            ]);
+            $quotation->items()->delete();
+        } else {
+            $quotation = Quotation::create([
+                'customer_name' => $this->customer_name,
+                'customer_phone' => $this->customer_phone,
+                'date' => $this->date,
+                'quotation_number' => $this->quotation_number,
+                'subtotal' => $this->subtotal,
+                'fixed_charge' => $this->fixed_charge,
+                'transport_charge' => $this->transport_charge,
+                'additional_amount' => $this->additional_amount,
+                'additional_notes' => $this->additional_notes,
+                'grand_total' => $this->total,
+            ]);
+        }
 
         foreach ($this->items as $item) {
             $quotation->items()->create([
