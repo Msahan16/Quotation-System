@@ -88,6 +88,7 @@
                         @if($item->has_louver) (With Louver) @endif
                         @if($item->has_fix_glass) (With Fix Glass) @endif
                         @if($item->has_key_lock) (With Key Lock) @endif
+                        @if($item->has_fiber_board) (With Fiber Board) @endif
                     </div>
                 </td>
                 <td class="center">{{ $item->size }}</td>

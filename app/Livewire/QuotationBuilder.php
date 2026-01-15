@@ -18,43 +18,57 @@ class QuotationBuilder extends Component
             'name' => 'Pantry Cupboard',
             'colors' => ['Teak Wood', 'Yellow Wood', 'White', 'Black', 'Gray', 'Natural'],
             'has_louver' => false,
-            'has_key_lock' => false
+            'has_key_lock' => false,
+            'has_fiber_board' => true
         ],
         [
             'name' => 'Section Door',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => true
+            'has_key_lock' => true,
+            'has_fiber_board' => false
         ],
         [
             'name' => 'Box Bar Bathroom Door',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => true
+            'has_key_lock' => true,
+            'has_fiber_board' => false
         ],
         [
             'name' => 'Sliding Window',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => false
+            'has_key_lock' => false,
+            'has_fiber_board' => false
         ],
         [
             'name' => 'Swing Window',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => false
+            'has_key_lock' => false,
+            'has_fiber_board' => false
+        ],
+        [
+            'name' => 'Casement Window',
+            'colors' => ['Wood', 'White', 'Black', 'Natural'],
+            'has_louver' => true,
+            'has_key_lock' => false,
+            'has_fiber_board' => false
         ],
         [
             'name' => 'Fix Glass',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => false
+            'has_key_lock' => false,
+            'has_fiber_board' => false
         ],
         [
             'name' => 'FanLight',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
-            'has_key_lock' => false
+            'has_key_lock' => false,
+            'has_fiber_board' => false
         ],
     ];
 
@@ -71,6 +85,7 @@ class QuotationBuilder extends Component
         'has_louver' => false,
         'has_fix_glass' => false,
         'has_key_lock' => false,
+        'has_fiber_board' => false,
         'size' => '',
         'unit_price' => 0,
         'quantity' => 1,
@@ -110,6 +125,7 @@ class QuotationBuilder extends Component
                         'has_louver' => $item->has_louver,
                         'has_fix_glass' => $item->has_fix_glass ?? false,
                         'has_key_lock' => $item->has_key_lock ?? false,
+                        'has_fiber_board' => $item->has_fiber_board ?? false,
                         'size' => $item->size,
                         'unit_price' => $item->unit_price,
                         'quantity' => $item->quantity,
@@ -149,6 +165,7 @@ class QuotationBuilder extends Component
             'has_louver' => false,
             'has_fix_glass' => false,
             'has_key_lock' => false,
+            'has_fiber_board' => false,
             'size' => '',
             'unit_price' => 0,
             'quantity' => 1,
@@ -169,6 +186,7 @@ class QuotationBuilder extends Component
             'has_louver' => $this->tempItem['has_louver'],
             'has_fix_glass' => $this->tempItem['has_fix_glass'],
             'has_key_lock' => $this->tempItem['has_key_lock'],
+            'has_fiber_board' => $this->tempItem['has_fiber_board'],
             'size' => $this->tempItem['size'],
             'unit_price' => $this->tempItem['unit_price'],
             'quantity' => $this->tempItem['quantity'],
@@ -271,6 +289,9 @@ class QuotationBuilder extends Component
             }
             if ($item->has_key_lock) {
                 $message .= "   • With Key Lock\n";
+            }
+            if ($item->has_fiber_board) {
+                $message .= "   • With Fiber Board\n";
             }
             $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
@@ -381,6 +402,7 @@ class QuotationBuilder extends Component
                 'has_louver' => $item['has_louver'],
                 'has_fix_glass' => $item['has_fix_glass'] ?? false,
                 'has_key_lock' => $item['has_key_lock'] ?? false,
+                'has_fiber_board' => $item['has_fiber_board'] ?? false,
                 'size' => $item['size'],
                 'unit_price' => $item['unit_price'],
                 'quantity' => $item['quantity'],

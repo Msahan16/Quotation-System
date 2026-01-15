@@ -56,6 +56,9 @@ class QuotationList extends Component
             if ($item->has_key_lock) {
                 $message .= "   • With Key Lock\n";
             }
+            if ($item->has_fiber_board) {
+                $message .= "   • With Fiber Board\n";
+            }
             $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
         }

@@ -26,11 +26,22 @@
                 <h2 class="panel-title">Select Product</h2>
                 <div class="product-grid">
                     @foreach($categories as $index => $cat)
+                        @php
+                            $imageMap = [
+                                'Pantry Cupboard' => 'Pantry.png',
+                                'Section Door' => 'section Door.png',
+                                'Box Bar Bathroom Door' => 'BoxBarDoor.png',
+                                'Sliding Window' => 'Sliding.png',
+                                'Swing Window' => 'swing window.png',
+                                'Casement Window' => 'casement.png',
+                                'Fix Glass' => 'Fix Glass.png',
+                                'FanLight' => 'FanLight.png'
+                            ];
+                            $imageName = $imageMap[$cat['name']] ?? 'Pantry.png';
+                        @endphp
                         <div class="product-card" wire:click="selectCategory({{ $index }})">
-                            <div class="product-image" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;">
-                                <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                </svg>
+                            <div class="product-image">
+                                <img src="{{ asset($imageName) }}" alt="{{ $cat['name'] }}" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
                             <div class="product-name">{{ $cat['name'] }}</div>
                         </div>
@@ -73,6 +84,7 @@
                     </div>
                     @endif
 
+                    @if(!$selectedCategory['has_fiber_board'] && $selectedCategory['name'] !== 'Fix Glass')
                     <div class="form-group">
                         <label class="form-label">Fix Glass Option</label>
                         <label class="switch">
@@ -81,6 +93,18 @@
                         </label>
                         <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_fix_glass'] ? 'With Fix Glass' : 'Standard' }}</span>
                     </div>
+                    @endif
+
+                    @if($selectedCategory['has_fiber_board'])
+                    <div class="form-group">
+                        <label class="form-label">Fiber Board Option</label>
+                        <label class="switch">
+                            <input type="checkbox" wire:model.live="tempItem.has_fiber_board">
+                            <span class="slider"></span>
+                        </label>
+                        <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_fiber_board'] ? 'With Fiber Board' : 'Standard' }}</span>
+                    </div>
+                    @endif
 
                     @if($selectedCategory['has_key_lock'])
                     <div class="form-group">
@@ -154,6 +178,7 @@
                                                 @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
                                                 @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
                                                 @if($item['has_key_lock'] ?? false) <span class="key-lock-badge">+ Key Lock</span> @endif
+                                                @if($item['has_fiber_board'] ?? false) <span class="fiber-board-badge">+ Fiber Board</span> @endif
                                             </div>
                                         </div>
                                         <button wire:click="removeItem({{ $index }})" class="remove-btn" title="Remove">
@@ -412,6 +437,15 @@
         .key-lock-badge {
             background: #fed7aa;
             color: #92400e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .fiber-board-badge {
+            background: #e9d5ff;
+            color: #6b21a8;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.75rem;
