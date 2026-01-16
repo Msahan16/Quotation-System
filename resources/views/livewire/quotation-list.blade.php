@@ -98,10 +98,33 @@
     </style>
 
     <script>
-        document.addEventListener('livewire:initialized', () => {
-            @this.on('open-whatsapp', (event) => {
-                window.open(event[0].url, '_blank');
-            });
+        // Initialize event listeners immediately when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Livewire to be available
+            if (typeof Livewire !== 'undefined') {
+                setupEventListeners();
+            } else {
+                // If Livewire isn't ready yet, wait for it
+                document.addEventListener('livewire:initialized', setupEventListeners);
+            }
         });
+
+        function setupEventListeners() {
+            // Handle WhatsApp sharing
+            Livewire.on('open-whatsapp', (event) => {
+                try {
+                    const data = Array.isArray(event) ? event[0] : event;
+                    console.log('Opening WhatsApp with URL:', data.url);
+                    
+                    if (data.url) {
+                        window.open(data.url, '_blank');
+                    } else {
+                        console.error('No WhatsApp URL provided');
+                    }
+                } catch (error) {
+                    console.error('Error opening WhatsApp:', error);
+                }
+            });
+        }
     </script>
 </div>
