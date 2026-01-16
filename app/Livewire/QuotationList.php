@@ -80,7 +80,7 @@ class QuotationList extends Component
         $message .= "\n*GRAND TOTAL: Rs. " . number_format($quotation->grand_total, 2) . "*\n\n";
         
         if ($quotation->additional_notes) {
-            $message .= "📝 *Note:* {$quotation->additional_notes}\n\n";
+            $message .= " *Note:* {$quotation->additional_notes}\n\n";
         }
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
@@ -90,8 +90,8 @@ class QuotationList extends Component
         $message .= "No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
         $message .= "_A detailed PDF quotation has been prepared for your reference._";
 
-        $phone = $quotation->customer_phone ? preg_replace('/[^0-9]/', '', '94' . ltrim($quotation->customer_phone, '0')) : '';
-        $whatsappUrl = "https://wa.me/{$phone}?text=" . urlencode($message);
+        // Use WhatsApp share URL without phone number to allow sharing with anyone
+        $whatsappUrl = "https://wa.me/?text=" . urlencode($message);
 
         $this->dispatch('open-whatsapp', ['url' => $whatsappUrl]);
     }

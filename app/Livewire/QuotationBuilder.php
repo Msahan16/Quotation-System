@@ -226,6 +226,15 @@ class QuotationBuilder extends Component
         return collect($this->items)->sum('total');
     }
 
+    public function getAllColorsProperty()
+    {
+        $colors = [];
+        foreach ($this->categories as $category) {
+            $colors = array_merge($colors, $category['colors']);
+        }
+        return array_values(array_unique($colors));
+    }
+
     public function saveAndGenerate()
     {
         if (empty($this->items)) {
@@ -326,8 +335,8 @@ class QuotationBuilder extends Component
         $message .= "No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
         $message .= "_A detailed PDF quotation has been prepared for your reference._";
 
-        $phone = $this->customer_phone ? preg_replace('/[^0-9]/', '', '94' . ltrim($this->customer_phone, '0')) : '';
-        $whatsappUrl = "https://wa.me/{$phone}?text=" . urlencode($message);
+        // Use WhatsApp share URL without phone number to allow sharing with anyone
+        $whatsappUrl = "https://wa.me/?text=" . urlencode($message);
 
         // Send email notification
         try {
@@ -350,6 +359,10 @@ class QuotationBuilder extends Component
 
     private function resetForm()
     {
+        // Store editing state before reset
+        $wasEditing = $this->editingQuotationId !== null;
+        $savedQuotationNumber = $this->quotation_number;
+        
         $this->customer_name = '';
         $this->customer_phone = '';
         $this->items = [];
@@ -360,7 +373,17 @@ class QuotationBuilder extends Component
         $this->selectedCategory = null;
         $this->lastQuotationNumber = null;
         $this->lastDownloadUrl = null;
-        $this->quotation_number = $this->generateNextNumber();
+        
+        // If we were editing, keep the same quotation number and editing ID
+        // Otherwise, generate a new number
+        if ($wasEditing) {
+            $this->quotation_number = $savedQuotationNumber;
+            // Keep editingQuotationId so subsequent saves update the same record
+        } else {
+            $this->quotation_number = $this->generateNextNumber();
+            $this->editingQuotationId = null;
+        }
+        
         $this->date = date('Y-m-d');
     }
 

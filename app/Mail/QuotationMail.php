@@ -30,8 +30,13 @@ class QuotationMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $isUpdate = $this->quotation->created_at != $this->quotation->updated_at;
+        $subject = $isUpdate 
+            ? 'Updated Quotation - ' . $this->quotation->quotation_number
+            : 'New Quotation - ' . $this->quotation->quotation_number;
+            
         return new Envelope(
-            subject: 'New Quotation - ' . $this->quotation->quotation_number,
+            subject: $subject,
         );
     }
 

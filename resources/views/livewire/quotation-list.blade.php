@@ -55,6 +55,9 @@
                             Share on WhatsApp
                         </button>
                         <div style="display: flex; gap: 8px;">
+                            <a href="{{ route('quotation.view', $quotation->id) }}" wire:navigate style="background: #dbeafe; color: #1e40af; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" title="View Quotation">
+                                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </a>
                             <a href="{{ route('quotation.download', $quotation) }}" target="_blank" style="background: #e0e7ff; color: #3730a3; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" title="Download PDF">
                                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             </a>

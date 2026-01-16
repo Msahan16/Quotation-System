@@ -173,12 +173,22 @@
                                     <div class="item-header">
                                         <div class="item-info">
                                             <div class="item-name">{{ $item['product_name'] }}</div>
-                                            <div class="item-details">
-                                                {{ $item['size'] }} | {{ $item['color'] }} 
-                                                @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
-                                                @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
-                                                @if($item['has_key_lock'] ?? false) <span class="key-lock-badge">+ Key Lock</span> @endif
-                                                @if($item['has_fiber_board'] ?? false) <span class="fiber-board-badge">+ Fiber Board</span> @endif
+                                            <div class="item-details-editable">
+                                                <div class="editable-field-group">
+                                                    <input type="text" wire:model.live="items.{{ $index }}.size" class="size-input" placeholder="Size">
+                                                    <span class="separator">|</span>
+                                                    <select wire:model.live="items.{{ $index }}.color" class="color-select">
+                                                        @foreach($this->allColors as $color)
+                                                            <option value="{{ $color }}">{{ $color }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="badges-row">
+                                                    @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
+                                                    @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
+                                                    @if($item['has_key_lock'] ?? false) <span class="key-lock-badge">+ Key Lock</span> @endif
+                                                    @if($item['has_fiber_board'] ?? false) <span class="fiber-board-badge">+ Fiber Board</span> @endif
+                                                </div>
                                             </div>
                                         </div>
                                         <button wire:click="removeItem({{ $index }})" class="remove-btn" title="Remove">
@@ -417,6 +427,55 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
+        .item-details-editable {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .editable-field-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .size-input, .color-select {
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: white;
+            outline: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .size-input {
+            width: 80px;
+        }
+        .color-select {
+            flex: 1;
+            min-width: 100px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 28px;
+        }
+        .size-input:focus, .color-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            color: var(--text-primary);
+        }
+        .separator {
+            color: var(--text-secondary);
+            font-weight: 300;
+            font-size: 0.9rem;
+        }
+        .badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
         .louver-badge {
             background: #dbeafe;
             color: #1e40af;
@@ -553,6 +612,15 @@
             }
             .item-card {
                 padding: 12px;
+            }
+            .editable-field-group {
+                flex-wrap: wrap;
+            }
+            .size-input {
+                width: 70px;
+            }
+            .color-select {
+                min-width: 80px;
             }
         }
         

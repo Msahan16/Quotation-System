@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 Route::get('/', QuotationBuilder::class)->name('quotation.builder');
 Route::get('/edit/{edit}', QuotationBuilder::class)->name('quotation.edit');
 Route::get('/quotations', \App\Livewire\QuotationList::class)->name('quotation.list');
+Route::get('/quotation/{quotation}', \App\Livewire\QuotationView::class)->name('quotation.view');
 
 Route::get('/quotation/{quotation}/download', function (Quotation $quotation) {
     return response()->streamDownload(function () use ($quotation) {
