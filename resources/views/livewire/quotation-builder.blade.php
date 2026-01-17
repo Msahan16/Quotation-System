@@ -269,92 +269,116 @@
                         </div>
                         <div style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">The PDF has been downloaded automatically.</div>
                         <div style="display:flex; flex-direction:column; gap:8px;">
-                            <a href="{{ $lastDownloadUrl }}" class="btn btn-sm" style="background:#0284c7; color:white; text-decoration:none;">
+                            <button onclick="safeDownload('{{ $lastDownloadUrl }}', 'Quotation-{{ $lastQuotationNumber }}.pdf')" class="btn btn-sm" style="background:#0284c7; color:white; border:none; cursor:pointer; width:100%;">
                                 Re-download PDF
-                            </a>
+                            </button>
                         </div>
                     </div>
                 @endif
             </div>
         </div>
     </div>
+
     <script>
-        // Initialize event listeners immediately when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wait for Livewire to be available
-            if (typeof Livewire !== 'undefined') {
-                setupEventListeners();
-            } else {
-                // If Livewire isn't ready yet, wait for it
-                document.addEventListener('livewire:initialized', setupEventListeners);
+        // Safe download function to prevent browser blocking
+        window.safeDownload = async function(url, filename) {
+            try {
+                console.log('Starting download:', filename);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/pdf',
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Download failed');
+                }
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                console.log('Download completed:', filename);
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                try {
+                    const fallbackWindow = window.open(url, '_blank');
+                    if (!fallbackWindow) {
+                        alert('Please allow popups for this site to download the quotation, or try again.');
+                    }
+                } catch (fallbackError) {
+                    alert('Unable to download. Please check your browser settings and try again.');
+                }
             }
-        });
+        };
 
-        function setupEventListeners() {
-            // Handle quotation creation
-            Livewire.on('quotation-created', (event) => {
-                try {
-                    const data = Array.isArray(event) ? event[0] : event;
-                    
-                    console.log('Quotation created event received:', data);
-                    
-                    // 1. Trigger Download
-                    if (data.downloadUrl) {
-                        const link = document.createElement('a');
-                        link.href = data.downloadUrl;
-                        link.download = `Quotation-${data.quotationNumber}.pdf`;
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        
-                        // Clean up after a short delay
-                        setTimeout(() => {
-                            document.body.removeChild(link);
-                        }, 100);
-                    }
+        // Handle quotation creation
+        function handleQuotationCreated(event) {
+            try {
+                const data = Array.isArray(event) ? event[0] : event;
+                
+                console.log('Quotation created event received:', data);
+                
+                // 1. Trigger Safe Download
+                if (data.downloadUrl) {
+                    const filename = `Quotation-${data.quotationNumber}.pdf`;
+                    window.safeDownload(data.downloadUrl, filename);
+                }
 
-                    // 2. Open WhatsApp if URL exists
-                    if (data.whatsappUrl) {
-                        setTimeout(() => {
-                            window.open(data.whatsappUrl, '_blank');
-                        }, 500);
-                    }
-
-                    // 3. Force component refresh to clear all fields
+                // 2. Open WhatsApp if URL exists
+                if (data.whatsappUrl) {
                     setTimeout(() => {
-                        if (window.Livewire) {
-                            window.Livewire.find(document.querySelector('[wire\\\\:id]').getAttribute('wire:id')).$refresh();
-                        }
-                    }, 1000);
-                } catch (error) {
-                    console.error('Error handling quotation-created event:', error);
+                        window.open(data.whatsappUrl, '_blank');
+                    }, 500);
                 }
-            });
-
-            // Handle error messages
-            Livewire.on('show-error', (event) => {
-                try {
-                    const data = Array.isArray(event) ? event[0] : event;
-                    
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Oops!',
-                            text: data.message || 'An error occurred',
-                            confirmButtonText: 'OK',
-                            confirmButtonColor: '#0f172a',
-                            customClass: {
-                                popup: 'swal-custom'
-                            }
-                        });
-                    } else {
-                        alert(data.message || 'An error occurred');
-                    }
-                } catch (error) {
-                    console.error('Error handling show-error event:', error);
-                }
-            });
+            } catch (error) {
+                console.error('Error handling quotation-created event:', error);
+            }
         }
+
+        // Handle error messages
+        function handleShowError(event) {
+            try {
+                const data = Array.isArray(event) ? event[0] : event;
+                
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Oops!',
+                        text: data.message || 'An error occurred',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0f172a'
+                    });
+                } else {
+                    alert(data.message || 'An error occurred');
+                }
+            } catch (error) {
+                console.error('Error handling show-error event:', error);
+            }
+        }
+
+        // Setup Livewire event listeners
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('quotation-created', handleQuotationCreated);
+            Livewire.on('show-error', handleShowError);
+            console.log('QuotationBuilder event listeners initialized');
+        });
     </script>
     <style>
         .builder-header {

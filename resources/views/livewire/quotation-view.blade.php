@@ -119,10 +119,10 @@
 
         <!-- Action Buttons -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-            <a href="{{ route('quotation.download', $quotation) }}" style="background: #10b981; color: white; padding: 14px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+            <button onclick="safeDownload('{{ route('quotation.download', $quotation) }}', 'Quotation-{{ $quotation->quotation_number }}.pdf')" style="background: #10b981; color: white; padding: 14px 20px; border-radius: 12px; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; border: none; cursor: pointer; width: 100%;">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Download PDF
-            </a>
+            </button>
             <a href="{{ route('quotation.edit', $quotation->id) }}" wire:navigate style="background: #f59e0b; color: white; padding: 14px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit Quotation
@@ -136,4 +136,63 @@
             h2 { font-size: 1.1rem !important; }
         }
     </style>
+
+    <script>
+        // Safe download function to prevent browser blocking
+        async function safeDownload(url, filename) {
+            try {
+                // Show loading state (optional - you can add a visual indicator)
+                console.log('Starting download:', filename);
+                
+                // Fetch the file
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/pdf',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Download failed');
+                }
+
+                // Get the blob
+                const blob = await response.blob();
+                
+                // Create a temporary URL for the blob
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                // Create a temporary anchor element
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                link.style.display = 'none';
+                
+                // Append to body, click, and remove
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Clean up the blob URL after a short delay
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                console.log('Download completed:', filename);
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                // Fallback: Try opening in new window if fetch fails
+                try {
+                    const fallbackWindow = window.open(url, '_blank');
+                    if (!fallbackWindow) {
+                        // If popup was blocked, show user message
+                        alert('Please allow popups for this site to download the quotation, or try again.');
+                    }
+                } catch (fallbackError) {
+                    alert('Unable to download. Please check your browser settings and try again.');
+                }
+            }
+        }
+    </script>
 </div>

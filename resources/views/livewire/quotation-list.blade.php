@@ -50,17 +50,22 @@
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; padding-top: 15px; border-top: 1px solid #f1f5f9;">
-                        <button wire:click="shareToWhatsApp({{ $quotation->id }})" style="background: #22c55e; color: white; border: none; padding: 12px 15px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s;">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                            Share on WhatsApp
+                        <button 
+                            wire:click="shareToWhatsApp({{ $quotation->id }})" 
+                            wire:loading.attr="disabled"
+                            wire:target="shareToWhatsApp({{ $quotation->id }})"
+                            style="background: #22c55e; color: white; border: none; padding: 12px 15px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s;">
+                            <svg wire:loading.remove wire:target="shareToWhatsApp({{ $quotation->id }})" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            <span wire:loading wire:target="shareToWhatsApp({{ $quotation->id }})">Loading...</span>
+                            <span wire:loading.remove wire:target="shareToWhatsApp({{ $quotation->id }})">Share on WhatsApp</span>
                         </button>
                         <div style="display: flex; gap: 8px;">
                             <a href="{{ route('quotation.view', $quotation->id) }}" wire:navigate style="background: #dbeafe; color: #1e40af; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" title="View Quotation">
                                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </a>
-                            <a href="{{ route('quotation.download', $quotation) }}" style="background: #e0e7ff; color: #3730a3; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" title="Download PDF">
+                            <button onclick="safeDownload(&quot;{{ route('quotation.download', $quotation) }}&quot;, &quot;Quotation-{{ $quotation->quotation_number }}.pdf&quot;)" style="background: #e0e7ff; color: #3730a3; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; border: none; cursor: pointer;" title="Download PDF">
                                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            </a>
+                            </button>
                             <a href="{{ route('quotation.edit', $quotation->id) }}" wire:navigate style="background: #fef3c7; color: #92400e; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" title="Edit Quotation">
                                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
@@ -98,33 +103,91 @@
     </style>
 
     <script>
-        // Initialize event listeners immediately when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wait for Livewire to be available
-            if (typeof Livewire !== 'undefined') {
-                setupEventListeners();
-            } else {
-                // If Livewire isn't ready yet, wait for it
-                document.addEventListener('livewire:initialized', setupEventListeners);
-            }
-        });
+        // Safe download function to prevent browser blocking
+        window.safeDownload = async function(url, filename) {
+            try {
+                console.log('Starting download:', filename);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/pdf',
+                    },
+                    credentials: 'same-origin'
+                });
 
-        function setupEventListeners() {
-            // Handle WhatsApp sharing
-            Livewire.on('open-whatsapp', (event) => {
-                try {
-                    const data = Array.isArray(event) ? event[0] : event;
-                    console.log('Opening WhatsApp with URL:', data.url);
-                    
-                    if (data.url) {
-                        window.open(data.url, '_blank');
-                    } else {
-                        console.error('No WhatsApp URL provided');
-                    }
-                } catch (error) {
-                    console.error('Error opening WhatsApp:', error);
+                if (!response.ok) {
+                    throw new Error('Download failed');
                 }
-            });
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+                
+                console.log('Download completed:', filename);
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                try {
+                    const fallbackWindow = window.open(url, '_blank');
+                    if (!fallbackWindow) {
+                        alert('Please allow popups for this site to download the quotation, or try again.');
+                    }
+                } catch (fallbackError) {
+                    alert('Unable to download. Please check your browser settings and try again.');
+                }
+            }
+        };
+        
+        // Handle WhatsApp sharing directly via window function
+        window.openWhatsAppShare = function(quotationId) {
+            // Find the Livewire component and call the method
+            const component = Livewire.getByName('quotation-list')[0];
+            if (component) {
+                component.call('shareToWhatsApp', quotationId);
+            }
+        };
+
+        // Handle WhatsApp event
+        function handleOpenWhatsApp(event) {
+            try {
+                const data = Array.isArray(event) ? event[0] : event;
+                console.log('Opening WhatsApp with URL:', data.url);
+                
+                if (data.url) {
+                    window.open(data.url, '_blank');
+                } else {
+                    console.error('No WhatsApp URL provided');
+                }
+            } catch (error) {
+                console.error('Error opening WhatsApp:', error);
+            }
         }
+
+        // Setup Livewire event listeners - handle both init and navigated events
+        function setupWhatsAppListener() {
+            if (typeof Livewire !== 'undefined') {
+                Livewire.on('open-whatsapp', handleOpenWhatsApp);
+                console.log('QuotationList WhatsApp listener initialized');
+            }
+        }
+
+        // Initialize on first load
+        document.addEventListener('livewire:init', setupWhatsAppListener);
+        
+        // Re-initialize after navigation
+        document.addEventListener('livewire:navigated', setupWhatsAppListener);
     </script>
 </div>

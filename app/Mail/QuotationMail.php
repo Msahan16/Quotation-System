@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class QuotationMail extends Mailable
 {
@@ -22,7 +23,7 @@ class QuotationMail extends Mailable
      */
     public function __construct(Quotation $quotation)
     {
-        $this->quotation = $quotation;
+        $this->quotation = $quotation->load('items');
     }
 
     /**
@@ -30,7 +31,7 @@ class QuotationMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $isUpdate = $this->quotation->created_at != $this->quotation->updated_at;
+        $isUpdate = $this->quotation->created_at->ne($this->quotation->updated_at);
         $subject = $isUpdate 
             ? 'Updated Quotation - ' . $this->quotation->quotation_number
             : 'New Quotation - ' . $this->quotation->quotation_number;
@@ -60,12 +61,17 @@ class QuotationMail extends Mailable
      */
     public function attachments(): array
     {
-        // Generate PDF
-        $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $this->quotation]);
-        
-        return [
-            Attachment::fromData(fn () => $pdf->output(), 'quotation-' . $this->quotation->quotation_number . '.pdf')
-                ->withMime('application/pdf'),
-        ];
+        try {
+            // Generate PDF
+            $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $this->quotation]);
+            
+            return [
+                Attachment::fromData(fn () => $pdf->output(), 'quotation-' . $this->quotation->quotation_number . '.pdf')
+                    ->withMime('application/pdf'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Failed to generate PDF attachment: ' . $e->getMessage());
+            return []; // Return empty array if PDF generation fails
+        }
     }
 }
