@@ -11,20 +11,14 @@ Route::get('/quotations', \App\Livewire\QuotationList::class)->name('quotation.l
 Route::get('/quotation/{quotation}', \App\Livewire\QuotationView::class)->name('quotation.view');
 
 Route::get('/quotation/{quotation}/download', function (Quotation $quotation) {
-    $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $quotation]);
-    $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
-    
-    return response()->streamDownload(
-        function () use ($pdf) {
-            echo $pdf->output();
-        },
-        $filename,
-        [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Cache-Control' => 'no-cache, no-store, must-revalidate',
-            'Pragma' => 'no-cache',
-            'Expires' => '0',
-        ]
-    );
+    try {
+        $quotation->load('items');
+        $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $quotation]);
+        $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
+        
+        return $pdf->download($filename);
+    } catch (\Exception $e) {
+        \Log::error('PDF Download Error: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to generate PDF'], 500);
+    }
 })->name('quotation.download');

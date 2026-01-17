@@ -253,8 +253,33 @@ class QuotationBuilder extends Component
         $this->lastQuotationNumber = $quotation->quotation_number;
         $this->lastDownloadUrl = $downloadUrl;
         
-        // Use js() helper for reliable JavaScript execution
-        $this->js("window.safeDownload('{$downloadUrl}', 'Quotation-{$quotation->quotation_number}.pdf')");
+        // Use js() helper with inline download logic for reliability
+        $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
+        $this->js("
+            (async function() {
+                try {
+                    const response = await fetch('{$downloadUrl}', { credentials: 'same-origin' });
+                    if (!response.ok) throw new Error('Download failed');
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('Download error:', e);
+                    const a = document.createElement('a');
+                    a.href = '{$downloadUrl}';
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            })()
+        ");
     }
 
     public function saveAndWhatsApp()
@@ -339,9 +364,35 @@ class QuotationBuilder extends Component
         $this->lastQuotationNumber = $quotation->quotation_number;
         $this->lastDownloadUrl = $downloadUrl;
 
-        // Use js() helper for reliable JavaScript execution
-        $this->js("window.safeDownload('{$downloadUrl}', 'Quotation-{$quotation->quotation_number}.pdf')");
-        $this->js("setTimeout(() => window.open('{$whatsappUrl}', '_blank'), 500)");
+        // Use js() helper with inline download logic for reliability
+        $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
+        $this->js("
+            (async function() {
+                try {
+                    const response = await fetch('{$downloadUrl}', { credentials: 'same-origin' });
+                    if (!response.ok) throw new Error('Download failed');
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('Download error:', e);
+                    const a = document.createElement('a');
+                    a.href = '{$downloadUrl}';
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+                // Open WhatsApp after download
+                setTimeout(() => window.open('{$whatsappUrl}', '_blank'), 500);
+            })()
+        ");
     }
 
     /**
