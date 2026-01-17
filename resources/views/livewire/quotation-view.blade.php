@@ -119,7 +119,7 @@
 
         <!-- Action Buttons -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-            <a href="{{ route('quotation.download', $quotation) }}" target="_blank" style="background: #10b981; color: white; padding: 14px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+            <a href="{{ route('quotation.download', $quotation) }}" style="background: #10b981; color: white; padding: 14px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Download PDF
             </a>
