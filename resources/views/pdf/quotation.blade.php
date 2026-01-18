@@ -5,9 +5,7 @@
     <title>Quotation {{ $quotation->quotation_number }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #333; line-height: 1.4; margin: 0; padding: 20px; border: 1px solid #c9b397; }
-        .header-table { width: 100%; border: none; margin-bottom: 20px; border-collapse: collapse; }
-        .logo { height: 70px; }
-        .quotation-title { font-size: 32px; font-weight: bold; text-align: right; color: #000; letter-spacing: 2px; }
+        .quotation-title { font-size: 32px; font-weight: bold; text-align: center; color: #000; letter-spacing: 2px; margin-bottom: 20px; }
         .company-info { font-weight: bold; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
         
         .details-header-row { margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px; }
@@ -35,26 +33,7 @@
     </style>
 </head>
 <body>
-    <table class="header-table">
-        <tr>
-            <td style="width: 50%; vertical-align: top;">
-                @php
-                    $logoPath = public_path('AKM.png');
-                    $logoExists = file_exists($logoPath);
-                    $logoBase64 = $logoExists ? base64_encode(file_get_contents($logoPath)) : null;
-                @endphp
-                
-                @if($logoBase64)
-                    <img src="data:image/png;base64,{{ $logoBase64 }}" class="logo" alt="AKM Logo">
-                @else
-                    <div style="font-weight: bold; font-size: 18px; color: #c9b397;">A.K.M</div>
-                @endif
-            </td>
-            <td style="width: 50%; vertical-align: middle;">
-                <div class="quotation-title">QUOTATION</div>
-            </td>
-        </tr>
-    </table>
+    <div class="quotation-title">QUOTATION</div>
 
     <div class="company-info">
         A.K.M.Aluminium Fabrication<br>
