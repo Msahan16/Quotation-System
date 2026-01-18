@@ -407,7 +407,7 @@ class QuotationBuilder extends Component
         }
 
         try {
-            Mail::to($notificationEmail)->send(new QuotationMail($quotation));
+Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
         } catch (\Exception $e) {
             // Log error but don't stop the process
             Log::error('Failed to send quotation email: ' . $e->getMessage());

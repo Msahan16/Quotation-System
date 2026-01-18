@@ -11,8 +11,9 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class QuotationMail extends Mailable
+class QuotationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
