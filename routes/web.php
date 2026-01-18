@@ -12,13 +12,46 @@ Route::get('/quotation/{quotation}', \App\Livewire\QuotationView::class)->name('
 
 Route::get('/quotation/{quotation}/download', function (Quotation $quotation) {
     try {
+        // Set longer execution time for PDF generation
+        set_time_limit(120);
+        ini_set('max_execution_time', 120);
+        
+        // Load quotation items
         $quotation->load('items');
-        $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $quotation]);
+        
+        // Generate PDF with optimized settings
+        $pdf = Pdf::loadView('pdf.quotation', ['quotation' => $quotation])
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true)
+            ->setOption('defaultFont', 'sans-serif');
+        
         $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
         
-        return $pdf->download($filename);
+        // Return with proper headers for CORS and caching
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Accept',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
     } catch (\Exception $e) {
-        \Log::error('PDF Download Error: ' . $e->getMessage());
-        return response()->json(['error' => 'Failed to generate PDF'], 500);
+        \Log::error('PDF Download Error: ' . $e->getMessage(), [
+            'quotation_id' => $quotation->id,
+            'trace' => $e->getTraceAsString()
+        ]);
+        
+        // Return error response with CORS headers
+        return response()->json([
+            'error' => 'Failed to generate PDF',
+            'message' => config('app.debug') ? $e->getMessage() : 'Please try again or contact support.'
+        ], 500, [
+            'Access-Control-Allow-Origin' => '*',
+            'Content-Type' => 'application/json'
+        ]);
     }
 })->name('quotation.download');

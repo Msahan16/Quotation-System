@@ -105,22 +105,51 @@
     <script>
         // Safe download function to prevent browser blocking
         window.safeDownload = async function(url, filename) {
+            // Get the button that was clicked
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = `
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" style="animation: spin 1s linear infinite;">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </svg>
+            `;
+            
             try {
                 console.log('Starting download:', filename);
+                
+                // Fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/pdf',
+                        'X-Requested-With': 'XMLHttpRequest',
                     },
+                    signal: controller.signal,
                     credentials: 'same-origin'
                 });
+                
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
-                    throw new Error('Download failed');
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Download failed');
+                    }
+                    throw new Error(`Server error: ${response.status}`);
                 }
 
                 const blob = await response.blob();
+                
+                if (blob.type !== 'application/pdf' && !blob.type.includes('pdf')) {
+                    console.warn('Unexpected content type:', blob.type);
+                }
+                
                 const blobUrl = window.URL.createObjectURL(blob);
                 
                 const link = document.createElement('a');
@@ -137,19 +166,68 @@
                 }, 100);
                 
                 console.log('Download completed:', filename);
+                
+                // Show success
+                button.innerHTML = `
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                `;
+                
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalContent;
+                }, 2000);
+                
             } catch (error) {
                 console.error('Download error:', error);
                 
-                try {
-                    const fallbackWindow = window.open(url, '_blank');
-                    if (!fallbackWindow) {
-                        alert('Please allow popups for this site to download the quotation, or try again.');
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                
+                // Fallback
+                if (error.name !== 'AbortError') {
+                    try {
+                        console.log('Trying fallback method...');
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        link.target = '_blank';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        return;
+                    } catch (fallbackError) {
+                        console.error('Fallback failed:', fallbackError);
                     }
-                } catch (fallbackError) {
-                    alert('Unable to download. Please check your browser settings and try again.');
                 }
+                
+                let errorMessage = 'Unable to download the quotation. ';
+                if (error.name === 'AbortError') {
+                    errorMessage += 'The request timed out. Please check your internet connection and try again.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage += 'Network error. Please check your internet connection.';
+                } else {
+                    errorMessage += error.message || 'Please try again or contact support.';
+                }
+                
+                alert(errorMessage);
             }
         };
+        
+        // Add CSS for spinning animation
+        if (!document.getElementById('download-spinner-style')) {
+            const style = document.createElement('style');
+            style.id = 'download-spinner-style';
+            style.textContent = `
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         
         // Handle WhatsApp sharing directly via window function
         window.openWhatsAppShare = function(quotationId) {
