@@ -5,6 +5,12 @@ use App\Livewire\QuotationBuilder;
 use App\Models\Quotation;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+Route::get('/pdf-test', function () {
+    $pdf = Pdf::loadView('pdf.test');
+    return $pdf->download('test.pdf');
+});
+
+
 Route::get('/', QuotationBuilder::class)->name('quotation.builder');
 Route::get('/edit/{edit}', QuotationBuilder::class)->name('quotation.edit');
 Route::get('/quotations', \App\Livewire\QuotationList::class)->name('quotation.list');
