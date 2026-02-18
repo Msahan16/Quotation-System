@@ -88,6 +88,8 @@ class QuotationBuilder extends Component
         'has_key_lock' => false,
         'has_fiber_board' => false,
         'size' => '',
+        'pricing_type' => 'manual', // 'manual' or 'calculated'
+        'feet_price' => 0,
         'unit_price' => 0,
         'quantity' => 1,
     ];
@@ -168,9 +170,36 @@ class QuotationBuilder extends Component
             'has_key_lock' => false,
             'has_fiber_board' => false,
             'size' => '',
+            'pricing_type' => 'manual',
+            'feet_price' => 0,
             'unit_price' => 0,
             'quantity' => 1,
         ];
+    }
+
+    public function updatedTempItem($value, $key)
+    {
+        if (($this->tempItem['pricing_type'] ?? 'manual') === 'calculated') {
+            if ($key === 'size' || $key === 'feet_price' || $key === 'pricing_type') {
+                $this->calculateCalculatedUnitPrice();
+            }
+        }
+    }
+
+    private function calculateCalculatedUnitPrice()
+    {
+        $sizeStr = $this->tempItem['size'] ?? '';
+        $feetPrice = (float)($this->tempItem['feet_price'] ?? 0);
+
+        // Regular expression to find numbers in the size string (e.g., "3x4", "3 * 4", "3.5 x 4.2")
+        preg_match_all('/([0-9]*\.?[0-9]+)/', $sizeStr, $matches);
+
+        if (count($matches[0]) >= 2) {
+            $width = (float)$matches[0][0];
+            $height = (float)$matches[0][1];
+            $totalFeet = $width * $height;
+            $this->tempItem['unit_price'] = $totalFeet * $feetPrice;
+        }
     }
 
     public function addItem()

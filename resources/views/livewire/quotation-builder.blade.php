@@ -119,16 +119,40 @@
 
                     <div class="form-group">
                         <label class="form-label">Size / Dimensions</label>
-                        <input type="text" class="form-control" wire:model="tempItem.size" placeholder="e.g. 10x12 or Standard">
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="tempItem.size" placeholder="e.g. 10x12 or Standard">
                         @error('tempItem.size') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label class="form-label">Unit Price (Rs)</label>
-                            <input type="number" class="form-control" wire:model.live="tempItem.unit_price" step="0.01">
-                            @error('tempItem.unit_price') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
+                    <div class="form-group">
+                        <label class="form-label">Pricing Method</label>
+                        <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                                <input type="radio" wire:model.live="tempItem.pricing_type" value="manual"> Manual Price
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 0.9rem;">
+                                <input type="radio" wire:model.live="tempItem.pricing_type" value="calculated"> Size Based Calc
+                            </label>
                         </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        @if($tempItem['pricing_type'] === 'calculated')
+                            <div class="form-group">
+                                <label class="form-label">1ft Price (Rs)</label>
+                                <input type="number" class="form-control" wire:model.live="tempItem.feet_price" step="0.01" placeholder="Price per SqFt">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Unit Price (Rs)</label>
+                                <input type="number" class="form-control" wire:model.live="tempItem.unit_price" step="0.01" readonly style="background:#f1f5f9;">
+                            </div>
+                        @else
+                            <div class="form-group">
+                                <label class="form-label">Unit Price (Rs)</label>
+                                <input type="number" class="form-control" wire:model.live="tempItem.unit_price" step="0.01">
+                                @error('tempItem.unit_price') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+                        
                         <div class="form-group">
                             <label class="form-label">Quantity</label>
                             <input type="number" class="form-control" wire:model.live="tempItem.quantity" min="1">
