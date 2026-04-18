@@ -37,6 +37,13 @@ class QuotationBuilder extends Component
             'has_fiber_board' => false
         ],
         [
+            'name' => 'Box Bar Door',
+            'colors' => ['Wood', 'White', 'Black', 'Natural'],
+            'has_louver' => true,
+            'has_key_lock' => true,
+            'has_fiber_board' => false
+        ],
+        [
             'name' => 'Sliding Window',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,

@@ -31,6 +31,7 @@
                                 'Pantry Cupboard' => 'Pantry.png',
                                 'Section Door' => 'section Door.png',
                                 'Box Bar Bathroom Door' => 'BoxBarDoor.png',
+                                'Box Bar Door' => 'box bar Door.png',
                                 'Sliding Window' => 'Sliding.png',
                                 'Swing Window' => 'swing window.png',
                                 'Casement Window' => 'casement.png',
