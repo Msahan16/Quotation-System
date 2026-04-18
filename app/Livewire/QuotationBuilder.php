@@ -57,6 +57,14 @@ class QuotationBuilder extends Component
             'has_fiber_board' => false
         ],
         [
+            'name' => 'Partition',
+            'colors' => ['Wood', 'White', 'Black', 'Natural'],
+            'has_partition_options' => true,
+            'has_louver' => true,
+            'has_key_lock' => false,
+            'has_fiber_board' => false
+        ],
+        [
             'name' => 'Fix Glass',
             'colors' => ['Wood', 'White', 'Black', 'Natural'],
             'has_louver' => true,
@@ -81,6 +89,9 @@ class QuotationBuilder extends Component
     // Current Item building state
     public $selectedCategory = null;
     public $tempItem = [
+        'has_partition_door' => false,
+        'has_partition_sliding_door' => false,
+        'has_partition_sliding_window' => false,
         'color' => '',
         'has_louver' => false,
         'has_fix_glass' => false,
@@ -161,6 +172,9 @@ class QuotationBuilder extends Component
     {
         $this->selectedCategory = $this->categories[$index];
         $this->tempItem = [
+            'has_partition_door' => false,
+            'has_partition_sliding_door' => false,
+            'has_partition_sliding_window' => false,
             'color' => $this->selectedCategory['colors'][0] ?? '',
             'has_louver' => false,
             'has_fix_glass' => false,
@@ -180,8 +194,27 @@ class QuotationBuilder extends Component
             'tempItem.quantity' => 'required|integer|min:1',
         ]);
 
+        $productName = $this->selectedCategory['name'];
+        if ($productName === 'Partition') {
+            $partitionIncludes = [];
+
+            if (!empty($this->tempItem['has_partition_door'])) {
+                $partitionIncludes[] = 'Door';
+            }
+            if (!empty($this->tempItem['has_partition_sliding_door'])) {
+                $partitionIncludes[] = 'Sliding Door';
+            }
+            if (!empty($this->tempItem['has_partition_sliding_window'])) {
+                $partitionIncludes[] = 'Sliding Window';
+            }
+
+            if (!empty($partitionIncludes)) {
+                $productName .= ' with ' . implode(', ', $partitionIncludes);
+            }
+        }
+
         $this->items[] = [
-            'product_name' => $this->selectedCategory['name'],
+            'product_name' => $productName,
             'color' => $this->tempItem['color'],
             'has_louver' => $this->tempItem['has_louver'],
             'has_fix_glass' => $this->tempItem['has_fix_glass'],

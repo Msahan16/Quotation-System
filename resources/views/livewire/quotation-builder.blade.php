@@ -34,6 +34,7 @@
                                 'Sliding Window' => 'Sliding.png',
                                 'Swing Window' => 'swing window.png',
                                 'Casement Window' => 'casement.png',
+                                'Partition' => 'Partition.png',
                                 'Fix Glass' => 'Fix Glass.png',
                                 'FanLight' => 'FanLight.png'
                             ];
@@ -55,6 +56,39 @@
                     </div>
 
                     <div class="form-group">
+                        @if($selectedCategory['name'] === 'Partition')
+                        <div class="form-group">
+                            <label class="form-label">Partition Include Option</label>
+
+                            <div class="form-group" style="margin-bottom:10px;">
+                                <label class="form-label" style="font-size:0.9rem;">Door</label>
+                                <label class="switch">
+                                    <input type="checkbox" wire:model.live="tempItem.has_partition_door">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_partition_door'] ? 'With Door' : 'Standard' }}</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:10px;">
+                                <label class="form-label" style="font-size:0.9rem;">Sliding Door</label>
+                                <label class="switch">
+                                    <input type="checkbox" wire:model.live="tempItem.has_partition_sliding_door">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_partition_sliding_door'] ? 'With Sliding Door' : 'Standard' }}</span>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label" style="font-size:0.9rem;">Sliding Window</label>
+                                <label class="switch">
+                                    <input type="checkbox" wire:model.live="tempItem.has_partition_sliding_window">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="margin-left: 10px; font-size: 0.9rem;">{{ $tempItem['has_partition_sliding_window'] ? 'With Sliding Window' : 'Standard' }}</span>
+                            </div>
+                        </div>
+                        @endif
+
                         <label class="form-label">Color Variant</label>
                         <div class="color-options">
                             @foreach($selectedCategory['colors'] as $color)
