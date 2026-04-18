@@ -8,6 +8,7 @@ use App\Models\QuotationItem;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\QuotationMail;
 
 class QuotationBuilder extends Component
@@ -98,6 +99,8 @@ class QuotationBuilder extends Component
         'has_key_lock' => false,
         'has_fiber_board' => false,
         'size' => '',
+        'pricing_type' => 'manual', // 'manual' or 'calculated'
+        'feet_price' => 0,
         'unit_price' => 0,
         'quantity' => 1,
     ];
@@ -181,9 +184,36 @@ class QuotationBuilder extends Component
             'has_key_lock' => false,
             'has_fiber_board' => false,
             'size' => '',
+            'pricing_type' => 'manual',
+            'feet_price' => 0,
             'unit_price' => 0,
             'quantity' => 1,
         ];
+    }
+
+    public function updatedTempItem($value, $key)
+    {
+        if (($this->tempItem['pricing_type'] ?? 'manual') === 'calculated') {
+            if ($key === 'size' || $key === 'feet_price' || $key === 'pricing_type') {
+                $this->calculateCalculatedUnitPrice();
+            }
+        }
+    }
+
+    private function calculateCalculatedUnitPrice()
+    {
+        $sizeStr = $this->tempItem['size'] ?? '';
+        $feetPrice = (float)($this->tempItem['feet_price'] ?? 0);
+
+        // Regular expression to find numbers in the size string (e.g., "3x4", "3 * 4", "3.5 x 4.2")
+        preg_match_all('/([0-9]*\.?[0-9]+)/', $sizeStr, $matches);
+
+        if (count($matches[0]) >= 2) {
+            $width = (float)$matches[0][0];
+            $height = (float)$matches[0][1];
+            $totalFeet = $width * $height;
+            $this->tempItem['unit_price'] = $totalFeet * $feetPrice;
+        }
     }
 
     public function addItem()
@@ -271,35 +301,53 @@ class QuotationBuilder extends Component
     public function saveAndGenerate()
     {
         if (empty($this->items)) {
-            $this->dispatch('show-error', ['message' => 'Please add at least one item to the quotation before generating.']);
+            $this->js("alert('Please add at least one item to the quotation before generating.')");
             return;
         }
 
         $quotation = $this->createQuotation();
         $downloadUrl = route('quotation.download', $quotation);
 
-        // Send email notification
-        try {
-            Mail::to('mohammedshn2002@gmail.com')->send(new QuotationMail($quotation));
-        } catch (\Exception $e) {
-            // Log error but don't stop the process
-            \Log::error('Failed to send quotation email: ' . $e->getMessage());
-        }
+        // Send email notification to configured recipient
+        $this->sendEmailNotification($quotation);
 
         $this->resetForm();
         $this->lastQuotationNumber = $quotation->quotation_number;
         $this->lastDownloadUrl = $downloadUrl;
         
-        $this->dispatch('quotation-created', [
-            'downloadUrl' => $downloadUrl,
-            'quotationNumber' => $quotation->quotation_number
-        ]);
+        // Use js() helper with inline download logic for reliability
+        $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
+        $this->js("
+            (async function() {
+                try {
+                    const response = await fetch('{$downloadUrl}', { credentials: 'same-origin' });
+                    if (!response.ok) throw new Error('Download failed');
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('Download error:', e);
+                    const a = document.createElement('a');
+                    a.href = '{$downloadUrl}';
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            })()
+        ");
     }
 
     public function saveAndWhatsApp()
     {
         if (empty($this->items)) {
-            $this->dispatch('show-error', ['message' => 'Please add at least one item to the quotation before sharing.']);
+            $this->js("alert('Please add at least one item to the quotation before sharing.')");
             return;
         }
 
@@ -312,7 +360,7 @@ class QuotationBuilder extends Component
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
         $message .= "Dear *{$customerName}*,\n\n";
         $message .= "Thank you for your interest! Here is your quotation:\n\n";
-        $message .= "*Quotation #" . $quotation->quotation_number . "*\n";
+        $message .= "*Quotation " . $quotation->quotation_number . "*\n";
         $message .= "Date: " . $quotation->date->format('d M Y') . "\n";
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
         
@@ -321,22 +369,22 @@ class QuotationBuilder extends Component
         foreach ($quotation->items as $index => $item) {
             $itemNum = $index + 1;
             $message .= "{$itemNum}. *{$item->product_name}*\n";
-            $message .= "   • Size: {$item->size}\n";
-            $message .= "   • Color: {$item->variant}\n";
+            $message .= "   - Size: {$item->size}\n";
+            $message .= "   - Color: {$item->variant}\n";
             if ($item->has_louver) {
-                $message .= "   • With Louver\n";
+                $message .= "   - With Louver\n";
             }
             if ($item->has_fix_glass) {
-                $message .= "   • With Fix Glass\n";
+                $message .= "   - With Fix Glass\n";
             }
             if ($item->has_key_lock) {
-                $message .= "   • With Key Lock\n";
+                $message .= "   - With Key Lock\n";
             }
             if ($item->has_fiber_board) {
-                $message .= "   • With Fiber Board\n";
+                $message .= "   - With Fiber Board\n";
             }
-            $message .= "   • Qty: {$item->quantity} × Rs. " . number_format($item->unit_price, 2) . "\n";
-            $message .= "   • Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
+            $message .= "   - Qty: {$item->quantity} x Rs. " . number_format($item->unit_price, 2) . "\n";
+            $message .= "   - Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
         }
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
@@ -356,14 +404,14 @@ class QuotationBuilder extends Component
         $message .= "\n*GRAND TOTAL: Rs. " . number_format($quotation->grand_total, 2) . "*\n\n";
         
         if ($quotation->additional_notes) {
-            $message .= "📝 *Note:* {$quotation->additional_notes}\n\n";
+            $message .= "Note: {$quotation->additional_notes}\n\n";
         }
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
         $message .= "*Terms & Conditions:*\n";
-        $message .= "• Valid for 1 week\n";
-        $message .= "• 50% advance payment required\n";
-        $message .= "• Transport calculated by location\n\n";
+        $message .= "- Valid for 1 week\n";
+        $message .= "- 50% advance payment required\n";
+        $message .= "- Transport calculated by location\n\n";
         $message .= "Contact: 0750944571 / 0702098959\n";
         $message .= "No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
         $message .= "_A detailed PDF quotation has been prepared for your reference._";
@@ -371,23 +419,61 @@ class QuotationBuilder extends Component
         // Use WhatsApp share URL without phone number to allow sharing with anyone
         $whatsappUrl = "https://wa.me/?text=" . urlencode($message);
 
-        // Send email notification
-        try {
-            Mail::to('mohammedshn2002@gmail.com')->send(new QuotationMail($quotation));
-        } catch (\Exception $e) {
-            // Log error but don't stop the process
-            \Log::error('Failed to send quotation email: ' . $e->getMessage());
-        }
+        // Send email notification to configured recipient
+        $this->sendEmailNotification($quotation);
 
         $this->resetForm();
         $this->lastQuotationNumber = $quotation->quotation_number;
         $this->lastDownloadUrl = $downloadUrl;
 
-        $this->dispatch('quotation-created', [
-            'downloadUrl' => $downloadUrl,
-            'whatsappUrl' => $whatsappUrl,
-            'quotationNumber' => $quotation->quotation_number
-        ]);
+        // Use js() helper with inline download logic for reliability
+        $filename = 'Quotation-' . $quotation->quotation_number . '.pdf';
+        $this->js("
+            (async function() {
+                try {
+                    const response = await fetch('{$downloadUrl}', { credentials: 'same-origin' });
+                    if (!response.ok) throw new Error('Download failed');
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } catch(e) {
+                    console.error('Download error:', e);
+                    const a = document.createElement('a');
+                    a.href = '{$downloadUrl}';
+                    a.download = '{$filename}';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+                // Open WhatsApp after download
+                setTimeout(() => window.open('{$whatsappUrl}', '_blank'), 500);
+            })()
+        ");
+    }
+
+    /**
+     * Send email notification for quotation
+     */
+    private function sendEmailNotification($quotation)
+    {
+        $notificationEmail = config('app.notification_email', 'mohammedshn2002@gmail.com');
+        
+        if (empty($notificationEmail)) {
+            return;
+        }
+
+        try {
+Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            Log::error('Failed to send quotation email: ' . $e->getMessage());
+        }
     }
 
     private function resetForm()

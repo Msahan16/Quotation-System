@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Email
+    |--------------------------------------------------------------------------
+    |
+    | This email address will receive quotation notifications when new
+    | quotations are created or updated.
+    |
+    */
+
+    'notification_email' => env('NOTIFICATION_EMAIL', 'mohammedshn2002@gmail.com'),
+
 ];

@@ -16,6 +16,9 @@ class QuotationItem extends Model
         'unit_price' => 'decimal:2',
         'total' => 'decimal:2',
         'has_louver' => 'boolean',
+        'has_fix_glass' => 'boolean',
+        'has_key_lock' => 'boolean',
+        'has_fiber_board' => 'boolean',
     ];
 
     public function quotation(): BelongsTo
