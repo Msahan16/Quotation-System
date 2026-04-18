@@ -112,7 +112,16 @@
             @if($quotation->additional_notes)
             <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 4px solid #10b981;">
                 <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Additional Notes</div>
-                <div style="color: #1e293b; font-size: 0.95rem; line-height: 1.6;">{{ $quotation->additional_notes }}</div>
+                @php
+                    $additionalNotes = collect(preg_split('/\r\n|\r|\n/', $quotation->additional_notes))
+                        ->map(fn ($note) => trim($note))
+                        ->filter();
+                @endphp
+                <ul style="color: #1e293b; font-size: 0.95rem; line-height: 1.6; margin: 0; padding-left: 18px;">
+                    @foreach($additionalNotes as $note)
+                        <li>{{ $note }}</li>
+                    @endforeach
+                </ul>
             </div>
             @endif
         </div>

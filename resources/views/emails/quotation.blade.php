@@ -181,7 +181,9 @@
                 <div class="item">
                     <div class="item-title">{{ $index + 1 }}. {{ $item->product_name }}</div>
                     <div class="item-detail">Size: {{ $item->size }}</div>
+                    @if(($item->variant ?? '') !== 'N/A')
                     <div class="item-detail">Color: {{ $item->variant }}</div>
+                    @endif
                     @if($item->has_louver)
                     <div class="item-detail">✓ With Louver</div>
                     @endif
@@ -235,17 +237,38 @@
             @if($quotation->additional_notes)
             <div class="section">
                 <div class="section-title">Additional Notes</div>
-                <p>{{ $quotation->additional_notes }}</p>
+                @php
+                    $additionalNotes = collect(preg_split('/\r\n|\r|\n/', $quotation->additional_notes))
+                        ->map(fn ($note) => trim($note))
+                        ->filter();
+                @endphp
+                <ul>
+                    @foreach($additionalNotes as $note)
+                        <li>{{ $note }}</li>
+                    @endforeach
+                </ul>
             </div>
             @endif
 
             <div class="section">
                 <div class="terms">
                     <strong>Terms & Conditions:</strong>
+                    @php
+                        $termsConditions = collect(preg_split('/\r\n|\r|\n/', $quotation->terms_conditions ?: ''))
+                            ->map(fn ($term) => trim($term))
+                            ->filter();
+                        if ($termsConditions->isEmpty()) {
+                            $termsConditions = collect([
+                                'Valid for 1 week',
+                                '50% advance payment required',
+                                'Transport calculated by location',
+                            ]);
+                        }
+                    @endphp
                     <ul>
-                        <li>Valid for 1 week</li>
-                        <li>50% advance payment required</li>
-                        <li>Transport calculated by location</li>
+                        @foreach($termsConditions as $term)
+                            <li>{{ $term }}</li>
+                        @endforeach
                     </ul>
                 </div>
             </div>

@@ -325,6 +325,11 @@
                     <div class="form-group" style="margin-top:15px;">
                         <textarea class="form-control" wire:model="additional_notes" placeholder="Additional Notes..." rows="2"></textarea>
                     </div>
+
+                    <div class="form-group" style="margin-top:10px;">
+                        <label class="form-label">Terms & Conditions (One line = one point)</label>
+                        <textarea class="form-control" wire:model="terms_conditions" placeholder="Enter terms and conditions..." rows="4"></textarea>
+                    </div>
                 </div>
 
 

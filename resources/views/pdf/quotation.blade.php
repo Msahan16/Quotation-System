@@ -122,12 +122,32 @@
 
     <div class="terms-section">
         <div class="terms-title">TERMS AND CONDITIONS:</div>
+        @php
+            $termsConditions = collect(preg_split('/\r\n|\r|\n/', $quotation->terms_conditions ?: ''))
+                ->map(fn ($term) => trim($term))
+                ->filter();
+            if ($termsConditions->isEmpty()) {
+                $termsConditions = collect([
+                    'Validity: This quotation is valid for 1 Week',
+                    '50% of the Total Amount must be paid in Advance',
+                    'Shipping: Shipping cost is calculated based on the delivery location.',
+                ]);
+            }
+        @endphp
         <ul class="terms-list">
-            <li>Validity: This quotation is valid for 1 Week</li>
-            <li>50% of the Total Amount must be paid in Advance</li>
-            <li>Shipping: Shipping cost is calculated based on the delivery location.</li>
+            @foreach($termsConditions as $term)
+            <li>{{ $term }}</li>
+            @endforeach
             @if($quotation->additional_notes)
-            <li style="font-weight: bold; color: #d32f2f;">Note: {{ $quotation->additional_notes }}</li>
+            @php
+                $additionalNotes = collect(preg_split('/\r\n|\r|\n/', $quotation->additional_notes))
+                    ->map(fn ($note) => trim($note))
+                    ->filter();
+            @endphp
+            <div style="font-weight: bold; color: #d32f2f; margin-top: 8px;">Note:</div>
+            @foreach($additionalNotes as $note)
+            <li style="color: #d32f2f;">{{ ltrim($note, "- \t") }}</li>
+            @endforeach
             @endif
         </ul>
     </div>

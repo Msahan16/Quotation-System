@@ -130,6 +130,7 @@ class QuotationBuilder extends Component
     public $transport_charge = 0;
     public $additional_amount = 0;
     public $additional_notes = '';
+    public $terms_conditions = '';
 
     public $lastQuotationNumber = null;
     public $lastDownloadUrl = null;
@@ -149,6 +150,7 @@ class QuotationBuilder extends Component
                 $this->transport_charge = $quotation->transport_charge;
                 $this->additional_amount = $quotation->additional_amount;
                 $this->additional_notes = $quotation->additional_notes;
+                $this->terms_conditions = $quotation->terms_conditions ?: $this->defaultTermsConditions();
 
                 foreach ($quotation->items as $item) {
                     $this->items[] = [
@@ -169,6 +171,16 @@ class QuotationBuilder extends Component
         }
         $this->date = date('Y-m-d');
         $this->quotation_number = $this->generateNextNumber();
+        $this->terms_conditions = $this->defaultTermsConditions();
+    }
+
+    private function defaultTermsConditions(): string
+    {
+        return implode("\n", [
+            'Validity: This quotation is valid for 1 Week',
+            '50% of the Total Amount must be paid in Advance',
+            'Shipping: Shipping cost is calculated based on the delivery location.',
+        ]);
     }
 
     private function generateNextNumber()
@@ -427,14 +439,27 @@ class QuotationBuilder extends Component
         $message .= "\n*GRAND TOTAL: Rs. " . number_format($quotation->grand_total, 2) . "*\n\n";
         
         if ($quotation->additional_notes) {
-            $message .= "Note: {$quotation->additional_notes}\n\n";
+            $notes = preg_split('/\r\n|\r|\n/', $quotation->additional_notes);
+            $notes = array_filter(array_map('trim', $notes));
+
+            if (!empty($notes)) {
+                $message .= "*Additional Notes:*\n";
+                foreach ($notes as $note) {
+                    $message .= "- {$note}\n";
+                }
+                $message .= "\n";
+            }
         }
+
+        $terms = preg_split('/\r\n|\r|\n/', $quotation->terms_conditions ?: $this->defaultTermsConditions());
+        $terms = array_filter(array_map('trim', $terms));
         
         $message .= "━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
         $message .= "*Terms & Conditions:*\n";
-        $message .= "- Valid for 1 week\n";
-        $message .= "- 50% advance payment required\n";
-        $message .= "- Transport calculated by location\n\n";
+        foreach ($terms as $term) {
+            $message .= "- {$term}\n";
+        }
+        $message .= "\n";
         $message .= "Contact: 0750944571 / 0702098959\n";
         $message .= "No.551/6 Kandy Rd, Malwatta, Nittambuwa\n\n";
         $message .= "_A detailed PDF quotation has been prepared for your reference._";
@@ -512,6 +537,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
         $this->transport_charge = 0;
         $this->additional_amount = 0;
         $this->additional_notes = '';
+        $this->terms_conditions = $this->defaultTermsConditions();
         $this->selectedCategory = null;
         $this->lastQuotationNumber = null;
         $this->lastDownloadUrl = null;
@@ -542,6 +568,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
                 'transport_charge' => $this->transport_charge,
                 'additional_amount' => $this->additional_amount,
                 'additional_notes' => $this->additional_notes,
+                'terms_conditions' => $this->terms_conditions,
                 'grand_total' => $this->total,
             ]);
             $quotation->items()->delete();
@@ -556,6 +583,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
                 'transport_charge' => $this->transport_charge,
                 'additional_amount' => $this->additional_amount,
                 'additional_notes' => $this->additional_notes,
+                'terms_conditions' => $this->terms_conditions,
                 'grand_total' => $this->total,
             ]);
         }
