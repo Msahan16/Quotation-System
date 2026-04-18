@@ -86,6 +86,16 @@ class QuotationBuilder extends Component
             'has_key_lock' => false,
             'has_fiber_board' => false
         ],
+        [
+            'name' => 'Tempered Glass',
+            'colors' => [],
+            'requires_color' => false,
+            'tempered_door_options' => ['1 Door', '2 Door'],
+            'show_fix_glass_option' => false,
+            'has_louver' => false,
+            'has_key_lock' => false,
+            'has_fiber_board' => false
+        ],
     ];
 
     // Form inputs
@@ -100,6 +110,7 @@ class QuotationBuilder extends Component
         'has_partition_door' => false,
         'has_partition_sliding_door' => false,
         'has_partition_sliding_window' => false,
+        'tempered_door_option' => '',
         'color' => '',
         'has_louver' => false,
         'has_fix_glass' => false,
@@ -185,7 +196,8 @@ class QuotationBuilder extends Component
             'has_partition_door' => false,
             'has_partition_sliding_door' => false,
             'has_partition_sliding_window' => false,
-            'color' => $this->selectedCategory['colors'][0] ?? '',
+            'tempered_door_option' => $this->selectedCategory['tempered_door_options'][0] ?? '',
+            'color' => ($this->selectedCategory['requires_color'] ?? true) ? ($this->selectedCategory['colors'][0] ?? '') : 'N/A',
             'has_louver' => false,
             'has_fix_glass' => false,
             'has_key_lock' => false,
@@ -250,9 +262,13 @@ class QuotationBuilder extends Component
             }
         }
 
+        if ($productName === 'Tempered Glass' && !empty($this->tempItem['tempered_door_option'])) {
+            $productName .= ' with ' . $this->tempItem['tempered_door_option'];
+        }
+
         $this->items[] = [
             'product_name' => $productName,
-            'color' => $this->tempItem['color'],
+            'color' => ($this->selectedCategory['requires_color'] ?? true) ? $this->tempItem['color'] : 'N/A',
             'has_louver' => $this->tempItem['has_louver'],
             'has_fix_glass' => $this->tempItem['has_fix_glass'],
             'has_key_lock' => $this->tempItem['has_key_lock'],

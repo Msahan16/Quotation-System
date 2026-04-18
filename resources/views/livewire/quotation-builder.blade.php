@@ -37,7 +37,8 @@
                                 'Casement Window' => 'casement.png',
                                 'Partition' => 'Partition.png',
                                 'Fix Glass' => 'Fix Glass.png',
-                                'FanLight' => 'FanLight.png'
+                                'FanLight' => 'FanLight.png',
+                                'Tempered Glass' => 'Temperd.jpg'
                             ];
                             $imageName = $imageMap[$cat['name']] ?? 'Pantry.png';
                         @endphp
@@ -90,6 +91,22 @@
                         </div>
                         @endif
 
+                        @if($selectedCategory['name'] === 'Tempered Glass')
+                        <div class="form-group">
+                            <label class="form-label">Tempered Glass Include Option</label>
+                            <div style="display:flex;gap:15px;margin-top:8px;">
+                                @foreach($selectedCategory['tempered_door_options'] as $option)
+                                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.95rem;">
+                                        <input type="radio" wire:model.live="tempItem.tempered_door_option" value="{{ $option }}">
+                                        {{ $option }}
+                                    </label>
+                                @endforeach
+                            </div>
+                            <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['tempered_door_option'] }}</div>
+                        </div>
+                        @endif
+
+                        @if($selectedCategory['requires_color'] ?? true)
                         <label class="form-label">Color Variant</label>
                         <div class="color-options">
                             @foreach($selectedCategory['colors'] as $color)
@@ -106,6 +123,7 @@
                             @endforeach
                         </div>
                         <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['color'] }}</div>
+                        @endif
                     </div>
 
                     @if($selectedCategory['has_louver'])
@@ -119,7 +137,7 @@
                     </div>
                     @endif
 
-                    @if(!$selectedCategory['has_fiber_board'] && $selectedCategory['name'] !== 'Fix Glass')
+                    @if(!$selectedCategory['has_fiber_board'] && $selectedCategory['name'] !== 'Fix Glass' && ($selectedCategory['show_fix_glass_option'] ?? true))
                     <div class="form-group">
                         <label class="form-label">Fix Glass Option</label>
                         <label class="switch">
@@ -235,12 +253,14 @@
                                             <div class="item-details-editable">
                                                 <div class="editable-field-group">
                                                     <input type="text" wire:model.live="items.{{ $index }}.size" class="size-input" placeholder="Size">
-                                                    <span class="separator">|</span>
-                                                    <select wire:model.live="items.{{ $index }}.color" class="color-select">
-                                                        @foreach($this->allColors as $color)
-                                                            <option value="{{ $color }}">{{ $color }}</option>
-                                                        @endforeach
-                                                    </select>
+                                                    @if(($item['color'] ?? '') !== 'N/A')
+                                                        <span class="separator">|</span>
+                                                        <select wire:model.live="items.{{ $index }}.color" class="color-select">
+                                                            @foreach($this->allColors as $color)
+                                                                <option value="{{ $color }}">{{ $color }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @endif
                                                 </div>
                                                 <div class="badges-row">
                                                     @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
