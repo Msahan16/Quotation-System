@@ -17,6 +17,7 @@ class Quotation extends Model
         'subtotal' => 'decimal:2',
         'fixed_charge' => 'decimal:2',
         'transport_charge' => 'decimal:2',
+        'fixed_transport_charge' => 'decimal:2',
         'additional_amount' => 'decimal:2',
         'grand_total' => 'decimal:2',
     ];

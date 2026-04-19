@@ -331,6 +331,10 @@
                         <input type="number" step="0.01" class="form-control" wire:model.live="transport_charge" placeholder="0.00" style="font-size:0.9rem; padding:6px; width:140px; text-align:right;">
                     </div>
                     <div class="form-group" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.9rem; color:var(--text-secondary);">Fixed + Transport Charge</span>
+                        <input type="number" step="0.01" class="form-control" wire:model.live="fixed_transport_charge" placeholder="0.00" style="font-size:0.9rem; padding:6px; width:140px; text-align:right;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:0.9rem; color:var(--text-secondary);">Additional Amount</span>
                         <input type="number" step="0.01" class="form-control" wire:model.live="additional_amount" placeholder="0.00" style="font-size:0.9rem; padding:6px; width:140px; text-align:right;">
                     </div>

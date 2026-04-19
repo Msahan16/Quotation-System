@@ -96,6 +96,13 @@
                     <span style="font-weight: 600; color: #1e293b;">Rs. {{ number_format($quotation->transport_charge, 2) }}</span>
                 </div>
                 @endif
+
+                @if(($quotation->fixed_transport_charge ?? 0) > 0)
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                    <span style="color: #64748b; font-weight: 500;">Fixed + Transport Charge</span>
+                    <span style="font-weight: 600; color: #1e293b;">Rs. {{ number_format($quotation->fixed_transport_charge, 2) }}</span>
+                </div>
+                @endif
                 
                 @if($quotation->additional_amount > 0)
                 <div style="display: flex; justify-content: space-between; padding: 8px 0;">

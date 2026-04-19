@@ -224,6 +224,12 @@
                         <td class="amount-col">Rs. {{ number_format($quotation->transport_charge, 2) }}</td>
                     </tr>
                     @endif
+                    @if(($quotation->fixed_transport_charge ?? 0) > 0)
+                    <tr>
+                        <td class="label-col">Fixed + Transport Charge</td>
+                        <td class="amount-col">Rs. {{ number_format($quotation->fixed_transport_charge, 2) }}</td>
+                    </tr>
+                    @endif
                     @if($quotation->additional_amount > 0)
                     <tr>
                         <td class="label-col">Additional Charge</td>

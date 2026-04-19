@@ -107,6 +107,13 @@
             </tr>
             @endif
 
+            @if(($quotation->fixed_transport_charge ?? 0) > 0)
+            <tr class="total-row">
+                <td colspan="4" class="right">Fixed + Transport Charge</td>
+                <td class="right">{{ number_format($quotation->fixed_transport_charge, 0) }}</td>
+            </tr>
+            @endif
+
             @if($quotation->additional_amount > 0)
             <tr class="total-row">
                 <td colspan="4" class="right">Additional Charge</td>

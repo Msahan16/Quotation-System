@@ -80,6 +80,9 @@ class QuotationList extends Component
         if ($quotation->transport_charge > 0) {
             $message .= "Transport: Rs. " . number_format($quotation->transport_charge, 2) . "\n";
         }
+        if (($quotation->fixed_transport_charge ?? 0) > 0) {
+            $message .= "Fixed + Transport: Rs. " . number_format($quotation->fixed_transport_charge, 2) . "\n";
+        }
         if ($quotation->additional_amount > 0) {
             $message .= "Additional: Rs. " . number_format($quotation->additional_amount, 2) . "\n";
         }

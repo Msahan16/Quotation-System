@@ -142,6 +142,7 @@ class QuotationBuilder extends Component
     // Totals
     public $fixed_charge = 0;
     public $transport_charge = 0;
+    public $fixed_transport_charge = 0;
     public $additional_amount = 0;
     public $additional_notes = '';
     public $terms_conditions = '';
@@ -162,6 +163,7 @@ class QuotationBuilder extends Component
                 $this->quotation_number = $quotation->quotation_number;
                 $this->fixed_charge = $quotation->fixed_charge;
                 $this->transport_charge = $quotation->transport_charge;
+                $this->fixed_transport_charge = $quotation->fixed_transport_charge ?? 0;
                 $this->additional_amount = $quotation->additional_amount;
                 $this->additional_notes = $quotation->additional_notes;
                 $this->terms_conditions = $quotation->terms_conditions ?: $this->defaultTermsConditions();
@@ -346,7 +348,11 @@ class QuotationBuilder extends Component
     public function getTotalProperty()
     {
         $subtotal = collect($this->items)->sum('total');
-        return $subtotal + (float)$this->fixed_charge + (float)$this->transport_charge + (float)$this->additional_amount;
+        return $subtotal
+            + (float)$this->fixed_charge
+            + (float)$this->transport_charge
+            + (float)$this->fixed_transport_charge
+            + (float)$this->additional_amount;
     }
 
     public function getSubtotalProperty()
@@ -465,6 +471,9 @@ class QuotationBuilder extends Component
         if ($quotation->transport_charge > 0) {
             $message .= "Transport: Rs. " . number_format($quotation->transport_charge, 2) . "\n";
         }
+        if (($quotation->fixed_transport_charge ?? 0) > 0) {
+            $message .= "Fixed + Transport: Rs. " . number_format($quotation->fixed_transport_charge, 2) . "\n";
+        }
         if ($quotation->additional_amount > 0) {
             $message .= "Additional: Rs. " . number_format($quotation->additional_amount, 2) . "\n";
         }
@@ -568,6 +577,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
         $this->items = [];
         $this->fixed_charge = 0;
         $this->transport_charge = 0;
+        $this->fixed_transport_charge = 0;
         $this->additional_amount = 0;
         $this->additional_notes = '';
         $this->terms_conditions = $this->defaultTermsConditions();
@@ -599,6 +609,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
                 'subtotal' => $this->subtotal,
                 'fixed_charge' => $this->fixed_charge,
                 'transport_charge' => $this->transport_charge,
+                'fixed_transport_charge' => $this->fixed_transport_charge,
                 'additional_amount' => $this->additional_amount,
                 'additional_notes' => $this->additional_notes,
                 'terms_conditions' => $this->terms_conditions,
@@ -614,6 +625,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
                 'subtotal' => $this->subtotal,
                 'fixed_charge' => $this->fixed_charge,
                 'transport_charge' => $this->transport_charge,
+                'fixed_transport_charge' => $this->fixed_transport_charge,
                 'additional_amount' => $this->additional_amount,
                 'additional_notes' => $this->additional_notes,
                 'terms_conditions' => $this->terms_conditions,
