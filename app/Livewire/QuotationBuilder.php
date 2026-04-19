@@ -132,8 +132,8 @@ class QuotationBuilder extends Component
         'has_fiber_board' => false,
         'size' => '',
         'pricing_type' => 'manual', // 'manual' or 'calculated'
-        'feet_price' => 0,
-        'unit_price' => 0,
+        'feet_price' => '',
+        'unit_price' => '',
         'quantity' => 1,
     ];
 
@@ -239,8 +239,8 @@ class QuotationBuilder extends Component
             'has_fiber_board' => false,
             'size' => '',
             'pricing_type' => 'manual',
-            'feet_price' => 0,
-            'unit_price' => 0,
+            'feet_price' => '',
+            'unit_price' => '',
             'quantity' => 1,
         ];
     }
