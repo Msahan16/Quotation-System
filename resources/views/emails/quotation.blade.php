@@ -196,6 +196,9 @@
                     @if($item->has_fiber_board)
                     <div class="item-detail">✓ With Fiber Board</div>
                     @endif
+                    @if(!empty($item->custom_option))
+                    <div class="item-detail">✓ Custom Option: {{ $item->custom_option }}</div>
+                    @endif
                     <div class="item-detail">Quantity: {{ $item->quantity }} × Rs. {{ number_format($item->unit_price, 2) }}</div>
                     <div class="item-detail"><strong>Total: Rs. {{ number_format($item->total, 2) }}</strong></div>
                 </div>

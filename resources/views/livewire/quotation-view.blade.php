@@ -50,6 +50,7 @@
                                     @if($item->has_fix_glass) <span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 5px;">+ Fix Glass</span> @endif
                                     @if($item->has_key_lock) <span style="background: #fed7aa; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 5px;">+ Key Lock</span> @endif
                                     @if($item->has_fiber_board) <span style="background: #e9d5ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 5px;">+ Fiber Board</span> @endif
+                                    @if(!empty($item->custom_option)) <span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 5px;">+ {{ $item->custom_option }}</span> @endif
                                 </div>
                             </div>
                         </div>

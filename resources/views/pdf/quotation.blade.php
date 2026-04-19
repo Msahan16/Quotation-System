@@ -78,6 +78,7 @@
                         @if($item->has_fix_glass) (With Fix Glass) @endif
                         @if($item->has_key_lock) (With Key Lock) @endif
                         @if($item->has_fiber_board) (With Fiber Board) @endif
+                        @if(!empty($item->custom_option)) (Custom: {{ $item->custom_option }}) @endif
                     </div>
                 </td>
                 <td class="center">{{ $item->size }}</td>

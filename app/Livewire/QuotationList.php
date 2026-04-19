@@ -63,6 +63,9 @@ class QuotationList extends Component
             if ($item->has_fiber_board) {
                 $message .= "   - With Fiber Board\n";
             }
+            if (!empty($item->custom_option)) {
+                $message .= "   - Custom Option: {$item->custom_option}\n";
+            }
             $message .= "   - Qty: {$item->quantity} x Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   - Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
         }

@@ -180,6 +180,11 @@
                     @endif
 
                     <div class="form-group">
+                        <label class="form-label">Custom Option (Optional)</label>
+                        <input type="text" class="form-control" wire:model.live.debounce.300ms="tempItem.custom_option" placeholder="Add any manual option or requirement">
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Size / Dimensions</label>
                         <input type="text" class="form-control" wire:model.live.debounce.500ms="tempItem.size" placeholder="e.g. 10x12 or Standard">
                         @error('tempItem.size') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
@@ -271,11 +276,15 @@
                                                         </select>
                                                     @endif
                                                 </div>
+                                                <div class="editable-field-group" style="margin-top: 8px;">
+                                                    <input type="text" wire:model.live.debounce.300ms="items.{{ $index }}.custom_option" class="size-input" placeholder="Custom option (optional)">
+                                                </div>
                                                 <div class="badges-row">
                                                     @if($item['has_louver']) <span class="louver-badge">+ Louver</span> @endif
                                                     @if($item['has_fix_glass'] ?? false) <span class="fix-glass-badge">+ Fix Glass</span> @endif
                                                     @if($item['has_key_lock'] ?? false) <span class="key-lock-badge">+ Key Lock</span> @endif
                                                     @if($item['has_fiber_board'] ?? false) <span class="fiber-board-badge">+ Fiber Board</span> @endif
+                                                    @if(!empty($item['custom_option'] ?? '')) <span class="fix-glass-badge">+ {{ $item['custom_option'] }}</span> @endif
                                                 </div>
                                             </div>
                                         </div>

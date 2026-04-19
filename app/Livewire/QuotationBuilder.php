@@ -120,6 +120,7 @@ class QuotationBuilder extends Component
     public $selectedCategory = null;
     public $tempItem = [
         'custom_product_name' => '',
+        'custom_option' => '',
         'has_partition_door' => false,
         'has_partition_sliding_door' => false,
         'has_partition_sliding_window' => false,
@@ -168,6 +169,7 @@ class QuotationBuilder extends Component
                 foreach ($quotation->items as $item) {
                     $this->items[] = [
                         'product_name' => $item->product_name,
+                        'custom_option' => $item->custom_option ?? '',
                         'color' => $item->variant,
                         'has_louver' => $item->has_louver,
                         'has_fix_glass' => $item->has_fix_glass ?? false,
@@ -221,6 +223,7 @@ class QuotationBuilder extends Component
 
         $this->tempItem = [
             'custom_product_name' => '',
+            'custom_option' => '',
             'has_partition_door' => false,
             'has_partition_sliding_door' => false,
             'has_partition_sliding_window' => false,
@@ -306,6 +309,7 @@ class QuotationBuilder extends Component
 
         $this->items[] = [
             'product_name' => $productName,
+            'custom_option' => trim($this->tempItem['custom_option'] ?? ''),
             'color' => ($this->selectedCategory['requires_color'] ?? true) ? $this->tempItem['color'] : 'N/A',
             'has_louver' => $this->tempItem['has_louver'],
             'has_fix_glass' => $this->tempItem['has_fix_glass'],
@@ -443,6 +447,9 @@ class QuotationBuilder extends Component
             }
             if ($item->has_fiber_board) {
                 $message .= "   - With Fiber Board\n";
+            }
+            if (!empty($item->custom_option)) {
+                $message .= "   - Custom Option: {$item->custom_option}\n";
             }
             $message .= "   - Qty: {$item->quantity} x Rs. " . number_format($item->unit_price, 2) . "\n";
             $message .= "   - Total: *Rs. " . number_format($item->total, 2) . "*\n\n";
@@ -617,6 +624,7 @@ Mail::to($notificationEmail)->queue(new QuotationMail($quotation));
         foreach ($this->items as $item) {
             $quotation->items()->create([
                 'product_name' => $item['product_name'],
+                'custom_option' => $item['custom_option'] ?? null,
                 'variant' => $item['color'],
                 'has_louver' => $item['has_louver'],
                 'has_fix_glass' => $item['has_fix_glass'] ?? false,
