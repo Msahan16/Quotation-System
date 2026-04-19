@@ -186,7 +186,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Size / Dimensions</label>
-                        <input type="text" class="form-control" wire:model.live.debounce.500ms="tempItem.size" placeholder="e.g. 10x12 or Standard">
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="tempItem.size" placeholder="e.g. 10x12 or 120 total ft">
                         @error('tempItem.size') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
                     </div>
 

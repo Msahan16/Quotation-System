@@ -259,8 +259,14 @@ class QuotationBuilder extends Component
         $sizeStr = $this->tempItem['size'] ?? '';
         $feetPrice = (float)($this->tempItem['feet_price'] ?? 0);
 
-        // Regular expression to find numbers in the size string (e.g., "3x4", "3 * 4", "3.5 x 4.2")
+        // Accept either dimensions (e.g. 10x12) or direct total feet (e.g. 120).
         preg_match_all('/([0-9]*\.?[0-9]+)/', $sizeStr, $matches);
+
+        if (count($matches[0]) === 1) {
+            $totalFeet = (float)$matches[0][0];
+            $this->tempItem['unit_price'] = $totalFeet * $feetPrice;
+            return;
+        }
 
         if (count($matches[0]) >= 2) {
             $width = (float)$matches[0][0];
