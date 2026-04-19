@@ -111,7 +111,7 @@
                                     </label>
                                 @endforeach
                             </div>
-                            <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['tempered_door_option'] }}</div>
+                            <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['tempered_door_option'] ?: 'None' }}</div>
                         </div>
                         @endif
 
@@ -131,7 +131,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['color'] }}</div>
+                        <div style="margin-top:5px;font-size:0.8rem;color:var(--text-secondary);">Selected: {{ $tempItem['color'] ?: 'None' }}</div>
                         @endif
                     </div>
 

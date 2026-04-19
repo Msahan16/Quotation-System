@@ -217,13 +217,17 @@ class QuotationBuilder extends Component
     public function selectCategory($index)
     {
         $this->selectedCategory = $this->categories[$index];
+        $isCustom = $this->selectedCategory['is_custom'] ?? false;
+
         $this->tempItem = [
             'custom_product_name' => '',
             'has_partition_door' => false,
             'has_partition_sliding_door' => false,
             'has_partition_sliding_window' => false,
-            'tempered_door_option' => $this->selectedCategory['tempered_door_options'][0] ?? '',
-            'color' => ($this->selectedCategory['requires_color'] ?? true) ? ($this->selectedCategory['colors'][0] ?? '') : 'N/A',
+            'tempered_door_option' => $isCustom ? '' : ($this->selectedCategory['tempered_door_options'][0] ?? ''),
+            'color' => ($this->selectedCategory['requires_color'] ?? true)
+                ? ($isCustom ? '' : ($this->selectedCategory['colors'][0] ?? ''))
+                : 'N/A',
             'has_louver' => false,
             'has_fix_glass' => false,
             'has_key_lock' => false,
