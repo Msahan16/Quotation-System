@@ -96,6 +96,18 @@ class QuotationBuilder extends Component
             'has_key_lock' => false,
             'has_fiber_board' => false
         ],
+        [
+            'name' => 'Custom',
+            'is_custom' => true,
+            'colors' => ['Teak Wood', 'Yellow Wood', 'White', 'Black', 'Gray', 'Natural', 'Wood'],
+            'has_partition_options' => true,
+            'tempered_door_options' => ['1 Door', '2 Door'],
+            'show_fix_glass_option' => true,
+            'allow_fix_glass_with_fiber_board' => true,
+            'has_louver' => true,
+            'has_key_lock' => true,
+            'has_fiber_board' => true
+        ],
     ];
 
     // Form inputs
@@ -107,6 +119,7 @@ class QuotationBuilder extends Component
     // Current Item building state
     public $selectedCategory = null;
     public $tempItem = [
+        'custom_product_name' => '',
         'has_partition_door' => false,
         'has_partition_sliding_door' => false,
         'has_partition_sliding_window' => false,
@@ -205,6 +218,7 @@ class QuotationBuilder extends Component
     {
         $this->selectedCategory = $this->categories[$index];
         $this->tempItem = [
+            'custom_product_name' => '',
             'has_partition_door' => false,
             'has_partition_sliding_door' => false,
             'has_partition_sliding_window' => false,
@@ -255,8 +269,16 @@ class QuotationBuilder extends Component
             'tempItem.quantity' => 'required|integer|min:1',
         ]);
 
-        $productName = $this->selectedCategory['name'];
-        if ($productName === 'Partition') {
+        if (($this->selectedCategory['is_custom'] ?? false) && empty(trim($this->tempItem['custom_product_name'] ?? ''))) {
+            $this->addError('tempItem.custom_product_name', 'Please enter a product name for Custom item.');
+            return;
+        }
+
+        $productName = ($this->selectedCategory['is_custom'] ?? false)
+            ? trim($this->tempItem['custom_product_name'])
+            : $this->selectedCategory['name'];
+
+        if (!empty($this->selectedCategory['has_partition_options'])) {
             $partitionIncludes = [];
 
             if (!empty($this->tempItem['has_partition_door'])) {
@@ -274,7 +296,7 @@ class QuotationBuilder extends Component
             }
         }
 
-        if ($productName === 'Tempered Glass' && !empty($this->tempItem['tempered_door_option'])) {
+        if (!empty($this->selectedCategory['tempered_door_options']) && !empty($this->tempItem['tempered_door_option'])) {
             $productName .= ' with ' . $this->tempItem['tempered_door_option'];
         }
 

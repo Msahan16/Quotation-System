@@ -38,7 +38,8 @@
                                 'Partition' => 'Partition.png',
                                 'Fix Glass' => 'Fix Glass.png',
                                 'FanLight' => 'FanLight.png',
-                                'Tempered Glass' => 'Temperd.jpg'
+                                'Tempered Glass' => 'Temperd.jpg',
+                                'Custom' => 'AKM.png'
                             ];
                             $imageName = $imageMap[$cat['name']] ?? 'Pantry.png';
                         @endphp
@@ -58,7 +59,15 @@
                     </div>
 
                     <div class="form-group">
-                        @if($selectedCategory['name'] === 'Partition')
+                        @if($selectedCategory['is_custom'] ?? false)
+                        <div class="form-group">
+                            <label class="form-label">Custom Product Name</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.300ms="tempItem.custom_product_name" placeholder="Enter custom product name">
+                            @error('tempItem.custom_product_name') <span style="color:red;font-size:0.8rem;">{{ $message }}</span> @enderror
+                        </div>
+                        @endif
+
+                        @if($selectedCategory['has_partition_options'] ?? false)
                         <div class="form-group">
                             <label class="form-label">Partition Include Option</label>
 
@@ -91,7 +100,7 @@
                         </div>
                         @endif
 
-                        @if($selectedCategory['name'] === 'Tempered Glass')
+                        @if(!empty($selectedCategory['tempered_door_options'] ?? []))
                         <div class="form-group">
                             <label class="form-label">Tempered Glass Include Option</label>
                             <div style="display:flex;gap:15px;margin-top:8px;">
@@ -137,7 +146,7 @@
                     </div>
                     @endif
 
-                    @if(!$selectedCategory['has_fiber_board'] && $selectedCategory['name'] !== 'Fix Glass' && ($selectedCategory['show_fix_glass_option'] ?? true))
+                    @if($selectedCategory['name'] !== 'Fix Glass' && ($selectedCategory['show_fix_glass_option'] ?? true) && (($selectedCategory['allow_fix_glass_with_fiber_board'] ?? false) || !$selectedCategory['has_fiber_board']))
                     <div class="form-group">
                         <label class="form-label">Fix Glass Option</label>
                         <label class="switch">
