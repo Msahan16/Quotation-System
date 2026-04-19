@@ -9,6 +9,12 @@
                 <div>No.551/6 Kandy road, Malwatta Nittambuwa</div>
                 <div>0750944571 / 0702098959</div>
             </div>
+            <a href="{{ route('size.converter') }}" class="btn converter-btn">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h10M4 17h7" />
+                </svg>
+                <span>Size Converter</span>
+            </a>
             <a href="{{ route('quotation.list') }}" wire:navigate class="btn view-history-btn">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -553,6 +559,34 @@
         .view-history-btn:hover svg {
             transform: rotate(-15deg);
         }
+        .converter-btn {
+            background: rgba(20, 184, 166, 0.28);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 12px 22px;
+            border-radius: 99px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 5px;
+        }
+        .converter-btn:hover {
+            background: rgba(20, 184, 166, 0.42);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .converter-btn svg {
+            transition: transform 0.25s;
+        }
+        .converter-btn:hover svg {
+            transform: translateX(2px);
+        }
 
         /* Items Container Styles */
         .items-container {
@@ -764,6 +798,12 @@
                 margin: 0 auto;
             }
             .view-history-btn {
+                width: auto;
+                min-width: 200px;
+                padding: 14px 35px;
+                font-size: 0.95rem;
+            }
+            .converter-btn {
                 width: auto;
                 min-width: 200px;
                 padding: 14px 35px;

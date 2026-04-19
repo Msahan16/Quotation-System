@@ -12,6 +12,9 @@ Route::get('/pdf-test', function () {
 
 
 Route::get('/', QuotationBuilder::class)->name('quotation.builder');
+Route::get('/size-converter', function () {
+    return view('converter');
+})->name('size.converter');
 Route::get('/edit/{edit}', QuotationBuilder::class)->name('quotation.edit');
 Route::get('/quotations', \App\Livewire\QuotationList::class)->name('quotation.list');
 Route::get('/quotation/{quotation}', \App\Livewire\QuotationView::class)->name('quotation.view');
